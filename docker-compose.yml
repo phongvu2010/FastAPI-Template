@@ -1,0 +1,67 @@
+services:
+
+  # --- 1. Dịch vụ Cơ sở Dữ liệu (PostgreSQL) ---
+  db:
+    image: postgres:17
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    environment:
+      # Thiết lập CSDL dựa trên các biến từ .env
+      - TZ=${TZ}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      # Thêm cờ để tăng cường bảo mật
+      - POSTGRES_INITDB_ARGS=--data-checksums --auth=scram-sha-256
+    ports:
+      - 5433:5432
+    restart: always
+    healthcheck:
+      # Kiểm tra xem CSDL đã sẵn sàng nhận kết nối hay chưa
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  # --- 2. Khởi tạo database ---
+  prestart:
+    build: .
+    command: bash scripts/prestart.sh
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  # --- 3. Dịch vụ Ứng dụng (FastAPI) ---
+  app:
+    build: .
+    # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
+    # --reload: Tự động tải lại server khi code thay đổi
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes: # Khi sử dụng Dockerfile.Production thì disable volumes
+      - ./app:/src/app
+      - ./static:/src/static
+      - ./templates:/src/templates
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+      prestart:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+
+volumes:
+  postgres_data:

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[60vh]">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8 text-center">
+        <div class="mb-6">
+            <i class="fa-solid fa-shield-halved text-5xl text-indigo-600"></i>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Đăng nhập hệ thống</h2>
+        <p class="text-gray-500 mb-8">Sử dụng tài khoản Google doanh nghiệp của bạn để tiếp tục.</p>
+
+        <a href="{{ login_url }}" class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5 mr-3" alt="Google Logo" />
+            Tiếp tục với Google
+        </a>
+    </div>
+</div>
+{% endblock %}
