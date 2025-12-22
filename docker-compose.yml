@@ -1,5 +1,4 @@
 services:
-
   # --- 1. Dịch vụ Cơ sở Dữ liệu (PostgreSQL) ---
   db:
     image: postgres:17
@@ -13,6 +12,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       # Thêm cờ để tăng cường bảo mật
       - POSTGRES_INITDB_ARGS=--data-checksums --auth=scram-sha-256
+    networks:
+      - app_network
     ports:
       - 5433:5432
     restart: always
@@ -24,29 +25,45 @@ services:
       start_period: 30s
       timeout: 10s
 
-  # --- 2. Khởi tạo database ---
+  # --- 3. Dịch vụ Cloudflared ---
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    networks:
+      - app_network
+    restart: always
+
+  # --- 3. Khởi tạo database ---
   prestart:
     build: .
     command: bash scripts/prestart.sh
     env_file:
       - .env
+    networks:
+      - app_network
     depends_on:
       db:
         condition: service_healthy
         restart: true
 
-  # --- 3. Dịch vụ Ứng dụng (FastAPI) ---
+  # --- 4. Dịch vụ Ứng dụng (FastAPI) ---
   app:
     build: .
     # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
     # --reload: Tự động tải lại server khi code thay đổi
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     volumes: # Khi sử dụng Dockerfile.Production thì disable volumes
       - ./app:/src/app
       - ./static:/src/static
       - ./templates:/src/templates
     env_file:
       - .env
+    networks:
+      - app_network
     ports:
       - 8000:8000
     restart: always
@@ -62,6 +79,9 @@ services:
       retries: 5
       timeout: 5s
 
-
 volumes:
   postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
