@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.engine import Connection
 from sqlmodel import Session
 
-from app.core.db import engine
-from app.models.roles import Role, RoleCreate, UserRole
+from core.db import engine
+from models.roles import Role, RoleCreate, UserRole
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

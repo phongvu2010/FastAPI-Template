@@ -50,7 +50,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # # --- Giai đoạn 2: Runtime (Image cuối cùng) ---
 # # Sử dụng lại base image Python 3.12-slim cho môi trường chạy
-# FROM python:3.12-slim
+FROM python:3.12-slim AS runtime
 
 # --- Cấu hình Non-root User (Bảo mật) ---
 # 1. Tạo một nhóm (group) và người dùng (user) không có quyền root
@@ -60,13 +60,13 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /src
 # RUN chown -R appuser:appuser /src
 
-# # --- Sao chép các thành phần cần thiết ---
-# # 3. Sao chép các thư viện đã được cài đặt từ giai đoạn 'builder'
-# # Điều này giúp image runtime không chứa các công cụ build/cache.
-# COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+# --- Sao chép các thành phần cần thiết ---
+# 3. Sao chép các thư viện đã được cài đặt từ stage 'builder' sang stage 'runtime' hiện tại
+# Điều này giúp image runtime không chứa các công cụ build/cache.
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
-# # 4. Sao chép các tệp thực thi (uvicorn) từ /usr/local/bin/ của builder
-# COPY --from=builder /usr/local/bin/ /usr/local/bin/
+# 4. Sao chép các tệp thực thi (uvicorn) từ /usr/local/bin/ của builder
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 # 5. Sao chép toàn bộ mã nguồn của dự án (trong ngữ cảnh build) vào thư mục /src trong container
 # COPY ./pyproject.toml ./uv.lock ./alembic.ini /src
@@ -83,5 +83,5 @@ USER appuser
 EXPOSE 8000
 
 # Lệnh CMD mặc định để khởi chạy ứng dụng
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# CMD ["fastapi", "run", "app/main.py", "--workers", "4"]
