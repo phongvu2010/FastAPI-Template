@@ -51,13 +51,20 @@ async def update_my_profile(
     Updates current user profile.
     """
     update_data = profile_in.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(current_user, field, value)
 
-    db.add(current_user)
-    await db.commit()
-    await db.refresh(current_user)
-    return current_user
+    try:
+        return await crud.update_user_profile(db, current_user, update_data)
+    except IntegrityError as e:
+        if "contact_email" in str(e.orig):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This contact email address is already being used by another account.",
+            )
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The data is invalid or duplicated."
+        )
 
 
 @router.patch("/{user_id}/status", response_model=UserRead)

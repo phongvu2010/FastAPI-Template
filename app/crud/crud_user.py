@@ -101,6 +101,19 @@ async def update_last_login(db: AsyncSession, user: User) -> User:
     return user
 
 
+async def update_user_profile(db: AsyncSession, user: User, update_data: dict) -> User:
+    """
+    Updates the user's profile.
+    """
+    for field, value in update_data.items():
+        setattr(user, field, value)
+
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
 async def update_user_status(db: AsyncSession, user: User, is_active: bool) -> User:
     """
     Updates the user's active/inactive status.
