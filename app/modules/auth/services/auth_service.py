@@ -4,8 +4,8 @@ from urllib.parse import urlparse
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core import security
-from ..core.config import settings
+from ....core import security
+from ....core.config import settings
 from ..crud import crud_user as crud
 from ..models import User, UserCreateInternal, UserRole
 

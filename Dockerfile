@@ -72,6 +72,7 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 # COPY ./pyproject.toml ./uv.lock ./alembic.ini /src
 COPY --chown=appuser:appuser ./alembic.ini /src
 COPY --chown=appuser:appuser ./app /src/app
+COPY --chown=appuser:appuser ./migration /src/migration
 COPY --chown=appuser:appuser ./scripts /src/scripts
 COPY --chown=appuser:appuser ./static /src/static
 COPY --chown=appuser:appuser ./templates /src/templates
@@ -83,5 +84,5 @@ USER appuser
 EXPOSE 8000
 
 # Lệnh CMD mặc định để khởi chạy ứng dụng
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
-# CMD ["fastapi", "run", "app/main.py", "--workers", "4"]
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "app/main.py", "--workers", "4"]

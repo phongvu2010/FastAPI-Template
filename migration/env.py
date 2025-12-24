@@ -9,11 +9,11 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Add project base directory to sys.path
-BASE_DIR = pathlib.Path(__file__).resolve().parents[2]
+BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
 from app.core.config import settings
-from app.models import SQLModel
+from app.modules.auth.models import SQLModel
 
 # Alembic Config object
 config = context.config

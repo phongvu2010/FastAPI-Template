@@ -6,8 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.engine import Connection
 from sqlmodel import Session
 
-from core.db import engine
-from models.roles import Role, RoleCreate, UserRole
+from app.core.db import engine
+from app.modules.auth.models.roles import Role, RoleCreate, UserRole
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,9 +44,9 @@ def create_default_roles(conn: Connection) -> None:
             if not existing_role:
                 role = Role.model_validate(role_data)
                 session.add(role)
-                logger.info(f"Created default role: {role.name.value}")
+                logger.info(f" Created default role: {role.name.value}")
             else:
-                logger.info(f"Role already exists: {role_data.name.value}")
+                logger.info(f" Role already exists: {role_data.name.value}")
         session.commit()
 
 
@@ -54,10 +54,10 @@ async def init_db() -> None:
     """
     Initializes the database and seeds default data.
     """
-    logger.info("Initializing database...")
+    logger.info(" Initializing database...")
     async with engine.begin() as conn:
         await conn.run_sync(create_default_roles)
-    logger.info("Database initialization completed.")
+    logger.info(" Database initialization completed.")
 
 
 if __name__ == "__main__":

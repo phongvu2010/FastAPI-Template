@@ -1,16 +1,17 @@
 """
 initialize_models
 
-Revision ID: ffe847067b5d
+Revision ID: e28531d4cfd7
 Revises: 
-Create Date: 2025-12-22 02:08:25.452137
+Create Date: 2025-12-25 00:53:24.372755
 """
 from alembic import op
 import sqlalchemy as sa
 import sqlmodel.sql.sqltypes
 
+
 # revision identifiers, used by Alembic.
-revision = 'ffe847067b5d'
+revision = 'e28531d4cfd7'
 down_revision = None
 branch_labels = None
 depends_on = None

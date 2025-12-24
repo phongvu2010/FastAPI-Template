@@ -5,11 +5,11 @@ from fastapi import Cookie, Depends, HTTPException, status
 from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.config import settings
-from ..core.db import get_db
-from ..core.security import decode_access_token
-from ..crud import crud_user as crud
-from ..models import User, UserRole
+from .config import settings
+from .db import get_db
+from .security import decode_access_token
+from ..modules.auth.crud import crud_user as crud
+from ..modules.auth.models import User, UserRole
 
 # Setup logger
 logger = logging.getLogger(__name__)

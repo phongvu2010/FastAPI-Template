@@ -29,21 +29,21 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
-    command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     networks:
       - app_network
+    command: tunnel --no-autoupdate run
     restart: always
 
   # --- 3. Khởi tạo database ---
   prestart:
     build: .
-    command: bash scripts/prestart.sh
     env_file:
       - .env
     networks:
       - app_network
+    command: bash scripts/prestart.sh
     depends_on:
       db:
         condition: service_healthy
@@ -52,10 +52,6 @@ services:
   # --- 4. Dịch vụ Ứng dụng (FastAPI) ---
   app:
     build: .
-    # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
-    # --reload: Tự động tải lại server khi code thay đổi
-    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     volumes: # Khi sử dụng Dockerfile.Production thì disable volumes
       - ./app:/src/app
       - ./static:/src/static
@@ -66,6 +62,9 @@ services:
       - app_network
     ports:
       - 8000:8000
+    # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
+    # --reload: Tự động tải lại server khi code thay đổi
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload #--workers 4
     restart: always
     depends_on:
       db:

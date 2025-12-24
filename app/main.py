@@ -13,8 +13,10 @@ from fastapi_csrf_protect.exceptions import CsrfProtectError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
-from .api.deps import NotAuthenticatedWebException
-from .api.v1 import auth, users, utils
+from .modules.auth.routers import auth, users
+
+from .core.deps import NotAuthenticatedWebException
+from .api.v1 import utils
 from .core.config import settings
 from .web import views
 
