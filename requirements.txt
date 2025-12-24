@@ -34,3 +34,43 @@ black
 
 ## On MacOS
 greenlet
+
+
+
+# FastAPI stack
+# uvicorn[standard]
+# pydantic
+# pydantic-settings # Thay thế cho pydantic-extra-types cho settings/env
+# passlib[bcrypt]
+# psycopg
+# pydantic[email]
+
+# Database & ORM (PostgreSQL)
+# sqlalchemy #[asyncio]
+# psycopg2-binary
+
+# Authentication & Security
+# authlib
+# google-auth
+# google-auth-httplib2
+# httpx # Bắt buộc cho OAuth2
+# cryptography # Cho internal signing (RSA/PSS)
+# pyHanko
+
+# Background Tasks
+# celery[redis]
+
+# aiofiles # Cho xử lý file bất đồng bộ
+# requests
+# tenacity
+# Thư viện cho Google SSO (ví dụ: python-social-auth nếu cần, nhưng ta sẽ dùng logic OAuth2 thuần)
+# pyjwt
+
+# Render HTML
+# jinja2
+# python-multipart # Cho upload file
+
+# psycopg[binary]
+# bcrypt==4.0.1
+# passlib[bcrypt]==1.7.4
+# emails

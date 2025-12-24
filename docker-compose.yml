@@ -25,7 +25,7 @@ services:
       start_period: 30s
       timeout: 10s
 
-  # --- 3. Dịch vụ Cloudflared ---
+  # --- 2. Dịch vụ Cloudflared ---
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared

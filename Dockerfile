@@ -48,8 +48,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 #     uv sync
 
 
-# # --- Giai đoạn 2: Runtime (Image cuối cùng) ---
-# # Sử dụng lại base image Python 3.12-slim cho môi trường chạy
+# --- Giai đoạn 2: Runtime (Image cuối cùng) ---
+# Sử dụng lại base image Python 3.12-slim cho môi trường chạy
 FROM python:3.12-slim AS runtime
 
 # --- Cấu hình Non-root User (Bảo mật) ---
@@ -61,7 +61,7 @@ WORKDIR /src
 # RUN chown -R appuser:appuser /src
 
 # --- Sao chép các thành phần cần thiết ---
-# 3. Sao chép các thư viện đã được cài đặt từ stage 'builder' sang stage 'runtime' hiện tại
+# 3. Sao chép các thư viện đã được cài đặt từ giai đoạn 'builder' sang giai đoạn 'runtime' hiện tại
 # Điều này giúp image runtime không chứa các công cụ build/cache.
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
