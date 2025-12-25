@@ -16,7 +16,7 @@ from starlette.middleware.cors import CORSMiddleware
 from .modules.auth.routers import auth, users
 
 from .core.deps import NotAuthenticatedWebException
-from .api.v1 import utils
+from .web import utils
 from .core.config import settings
 from .web import views
 
