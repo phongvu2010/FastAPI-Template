@@ -136,8 +136,8 @@ async def auth_exception_redirect_handler(
 app.include_router(auth.router, prefix=settings.API_V1_STR)
 # app.include_router(documents.router, prefix=settings.API_V1_STR)
 app.include_router(users.router, prefix=settings.API_V1_STR)
-app.include_router(utils.router, prefix=settings.API_V1_STR)
 
 # Router for HTML/Web (HTMX)
 # Note: Web routes should generally not have the API prefix
+app.include_router(utils.router)
 app.include_router(views.router)

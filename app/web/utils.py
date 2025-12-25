@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 
 from ..core.config import settings
 
-router = APIRouter(prefix="/utils", tags=["utils"])
+router = APIRouter(tags=["utils"])
 
 
 @router.get("/health", response_class=HTMLResponse)
@@ -11,7 +11,7 @@ async def health(request: Request):
     """
     Basic endpoint for testing an application.
     """
-    current_origins = ", ".join(settings.all_cors_origins)
+    current_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS]
 
     return f"""
     <!DOCTYPE html>

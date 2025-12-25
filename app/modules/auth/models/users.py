@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship, SQLModel
@@ -110,8 +110,16 @@ class User(TimestampMixin, UserBase, table=True):
 
     is_active: bool = Field(default=False)
 
+    # Relationships
     # documents: List["Document"] = Relationship(back_populates="creator")
     roles: List["Role"] = Relationship(
         back_populates="users",
         link_model=UserRoleAssociation,
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
+
+    @model_validator(mode="after")
+    def set_default_contact_email(self):
+        if not self.contact_email and self.email:
+            self.contact_email = self.email
+        return self
