@@ -2,6 +2,7 @@ Generic single-database configuration.
 
 # Create migration
 alembic revision --autogenerate -m "initialize_models"
+alembic revision --autogenerate -m "add_document_models"
 
 # Apply migration
 alembic upgrade head

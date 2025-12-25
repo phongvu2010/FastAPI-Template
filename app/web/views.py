@@ -48,7 +48,6 @@ async def dashboard_page(
     Renders the dashboard.
     """
     user_role_names = {r.name for r in current_user.roles}
-
     return templates.TemplateResponse(
         "dashboard.html",
         {
@@ -71,7 +70,6 @@ async def login_page(
     """
     # Get cookie token
     token = request.cookies.get(settings.COOKIE_NAME)
-
     if token:
         user = await get_validated_user_or_none(db, token)
         if user:
@@ -102,7 +100,6 @@ async def admin_panel(
     Renders admin panel (Admin only).
     """
     user_role_names = {r.name for r in current_user.roles}
-
     # Manual Role Check
     if UserRole.ADMIN not in user_role_names:
         return render_error_response(

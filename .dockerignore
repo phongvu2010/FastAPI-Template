@@ -1,0 +1,17 @@
+# Python Caches
+# __pycache__
+# *.pyc
+# .mypy_cache
+# .coverage
+# app.egg-info
+# htmlcov
+
+# Virtual Environment
+# venv
+# .venv
+# .env
+
+# Git & IDE configs
+# .git
+# .idea
+# .vscode

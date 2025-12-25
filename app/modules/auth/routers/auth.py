@@ -106,7 +106,6 @@ async def google_callback(
             samesite="lax",
             secure=settings.COOKIE_SECURE,
         )
-
         return response
 
     except HTTPException as http_exc:

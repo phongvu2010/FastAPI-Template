@@ -97,7 +97,6 @@ def create_access_token(user_id: str) -> str:
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode = {"exp": expire, "sub": user_id}
-
     return jwt.encode(
         to_encode,
         settings.JWT_SECRET_KEY,

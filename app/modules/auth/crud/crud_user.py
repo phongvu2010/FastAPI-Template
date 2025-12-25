@@ -134,6 +134,7 @@ async def add_role_to_user(db: AsyncSession, user: User, role: Role) -> User:
         db.add(user)
         await db.commit()
         await db.refresh(user)
+
     return user
 
 
@@ -146,4 +147,5 @@ async def remove_role_from_user(db: AsyncSession, user: User, role: Role) -> Use
         db.add(user)
         await db.commit()
         await db.refresh(user)
+
     return user

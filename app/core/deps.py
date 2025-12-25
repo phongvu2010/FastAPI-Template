@@ -63,6 +63,7 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials.",
         )
+
     return user
 
 
@@ -108,6 +109,6 @@ def require_role(required_roles: list[UserRole]):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Insufficient permissions.",
             )
-        return current_user
 
+        return current_user
     return role_checker

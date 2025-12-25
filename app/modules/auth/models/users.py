@@ -50,10 +50,17 @@ class UserUpdateProfile(SQLModel):
     @field_validator("department")
     @classmethod
     def validate_department(cls, v: Optional[str]):
-        if v is None:
-            return v
+        if v is None: return v
         if v not in DEPARTMENTS:
             raise ValueError(f"Phòng ban '{v}' không hợp lệ. Vui lòng chọn trong danh sách: {', '.join(DEPARTMENTS)}")
+
+        return v
+
+    @field_validator("contact_email")
+    @classmethod
+    def lower_email(cls, v: Optional[str]) -> Optional[str]:
+        if v: return v.lower().strip()
+
         return v
 
 
@@ -103,6 +110,7 @@ class User(TimestampMixin, UserBase, table=True):
 
     is_active: bool = Field(default=False)
 
+    # documents: List["Document"] = Relationship(back_populates="creator")
     roles: List["Role"] = Relationship(
         back_populates="users",
         link_model=UserRoleAssociation,
