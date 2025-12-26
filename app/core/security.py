@@ -20,6 +20,17 @@ GOOGLE_OAUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 
+class NotAuthenticatedWebException(HTTPException):
+    """
+    Custom exception raised when a web user is not authenticated.
+    """
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authenticated for web content",
+        )
+
+
 # --- Google OAuth & CSRF Utilities ---
 
 def generate_state_token() -> str:

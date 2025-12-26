@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.deps import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
+from ..modules.auth.deps import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
 from ..core.config import settings
 from ..core.db import get_db
 from ..modules.auth.crud import crud_user as crud

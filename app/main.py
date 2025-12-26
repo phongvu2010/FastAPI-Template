@@ -15,10 +15,9 @@ from fastapi_csrf_protect.exceptions import CsrfProtectError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
-from .core.deps import NotAuthenticatedWebException
-from .web import utils
+from .core.security import NotAuthenticatedWebException
+from .web import utils, views
 from .core.config import settings
-from .web import views
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -152,7 +151,7 @@ def load_modules():
 
                 # Check if the module has a variable 'routers' before registering it.
                 if hasattr(module, "router"):
-                    app.include_router(module.router, prefix=settings.API_V1_STR)
+                    app.include_router(module.router)
                     print(f"✅ Module connected: {module_name}")
                 else:
                     print(f"⚠️ The module {module_name} is missing the variable 'router' in router.py.")

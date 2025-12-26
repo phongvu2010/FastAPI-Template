@@ -5,25 +5,15 @@ from fastapi import Cookie, Depends, HTTPException, status
 from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .config import settings
-from .db import get_db
-from .security import decode_access_token
-from ..modules.auth.crud import crud_user as crud
-from ..modules.auth.models import User, UserRole
+from ...core.config import settings
+from ...core.security import NotAuthenticatedWebException
+from ...core.db import get_db
+from ...core.security import decode_access_token
+from .crud import crud_user as crud
+from .models import User, UserRole
 
 # Setup logger
 logger = logging.getLogger(__name__)
-
-
-class NotAuthenticatedWebException(HTTPException):
-    """
-    Custom exception raised when a web user is not authenticated.
-    """
-    def __init__(self) -> None:
-        super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authenticated for web content",
-        )
 
 
 async def get_validated_user_or_none(

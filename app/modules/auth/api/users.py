@@ -6,7 +6,7 @@ from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....core.deps import CurrentUser, require_role
+from ..deps import CurrentUser, require_role
 from ....core.db import get_db
 from ..crud import crud_user as crud
 from ..models import (
