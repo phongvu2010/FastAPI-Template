@@ -1,9 +1,7 @@
 from fastapi import APIRouter
 
-from .api import auth
-
-from ...core.config import settings
-from .api import users
+from ....core.config import settings
+from .v1 import auth, users
 
 router = APIRouter()
 router.include_router(auth.router, prefix=settings.API_V1_STR)
