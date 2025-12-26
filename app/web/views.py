@@ -139,7 +139,7 @@ async def profile_page(
     """
     user_role_names = {r.name for r in current_user.roles}
     return templates.TemplateResponse(
-        "profile.html",
+        "auth/profile.html",
         {
             "request": request,
             "user": current_user,

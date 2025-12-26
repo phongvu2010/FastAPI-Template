@@ -43,7 +43,7 @@ services:
       - .env
     networks:
       - app_network
-    command: bash scripts/prestart.sh
+    command: bash prestart.sh
     depends_on:
       db:
         condition: service_healthy

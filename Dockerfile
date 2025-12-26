@@ -71,9 +71,9 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 # 5. Sao chép toàn bộ mã nguồn của dự án (trong ngữ cảnh build) vào thư mục /src trong container
 # COPY ./pyproject.toml ./uv.lock ./alembic.ini /src
 COPY --chown=appuser:appuser ./alembic.ini /src
+COPY --chown=appuser:appuser ./prestart.sh /src
 COPY --chown=appuser:appuser ./app /src/app
 COPY --chown=appuser:appuser ./migration /src/migration
-COPY --chown=appuser:appuser ./scripts /src/scripts
 COPY --chown=appuser:appuser ./static /src/static
 COPY --chown=appuser:appuser ./templates /src/templates
 

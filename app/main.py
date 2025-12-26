@@ -147,7 +147,7 @@ def load_modules():
             try:
                 # Dynamically load the module's routers.py file: app.modules.{module_name}.routers
                 # from .modules.auth.routers import auth, users
-                module_spec = f"app.modules.{module_name}.routers"
+                module_spec = f"app.modules.{module_name}.router"
                 module = importlib.import_module(module_spec)
 
                 # Check if the module has a variable 'routers' before registering it.
@@ -155,7 +155,7 @@ def load_modules():
                     app.include_router(module.router, prefix=settings.API_V1_STR)
                     print(f"✅ Module connected: {module_name}")
                 else:
-                    print(f"⚠️ The module {module_name} is missing the variable 'router' in routers.py.")
+                    print(f"⚠️ The module {module_name} is missing the variable 'router' in router.py.")
 
             except ImportError as e:
                 print(f"❌ Module cannot be loaded {module_name}: {e}")
