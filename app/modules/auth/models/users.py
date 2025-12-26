@@ -117,9 +117,3 @@ class User(TimestampMixin, UserBase, table=True):
         link_model=UserRoleAssociation,
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-
-    @model_validator(mode="after")
-    def set_default_contact_email(self):
-        if not self.contact_email and self.email:
-            self.contact_email = self.email
-        return self

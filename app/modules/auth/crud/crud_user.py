@@ -80,6 +80,9 @@ async def create_user_from_sso(
     """
     user = User.model_validate(user_in)
 
+    if not user.contact_email:
+        user.contact_email = user.email
+
     initial_role = await get_role_by_name(db, initial_role_name)
     if initial_role:
         user.roles.append(initial_role)

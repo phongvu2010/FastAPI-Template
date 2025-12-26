@@ -123,7 +123,7 @@ async def admin_panel(
             "roles": roles,
             "csrf_token": csrf_token,
             "api_user_prefix": "/api/v1/users",
-            "is_admin": True  # Use the flag utility to highlight the menu
+            "is_admin": True,
         },
     )
 
@@ -137,6 +137,7 @@ async def profile_page(
     """
     Renders profile page.
     """
+    user_role_names = {r.name for r in current_user.roles}
     return templates.TemplateResponse(
         "profile.html",
         {
@@ -144,6 +145,7 @@ async def profile_page(
             "user": current_user,
             "csrf_token": csrf_token,
             "departments": DEPARTMENTS,
+            "is_admin": UserRole.ADMIN in user_role_names,
         },
     )
 

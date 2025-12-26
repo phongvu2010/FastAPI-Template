@@ -1,8 +1,10 @@
 # uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --workers 4
 # fastapi run app/main.py --host 0.0.0.0 --port 8000 --reload --workers 4
 
+import importlib
 import logging
 # import sentry_sdk
+import os
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -12,8 +14,6 @@ from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
-
-from .modules.auth.routers import auth, users
 
 from .core.deps import NotAuthenticatedWebException
 from .web import utils
@@ -127,15 +127,49 @@ async def auth_exception_redirect_handler(
     )
 
 
+def load_modules():
+    """
+    Automatically scan the app/modules/ directory and register APIRouters.
+    Each module must have a 'router.py' file containing the 'router' variable.
+    """
+    modules_base_path = os.path.join(os.path.dirname(__file__), "modules")
+
+    if not os.path.exists(modules_base_path):
+        print("⚠️ The modules folder has not been created.")
+        return
+
+    # Browse through the subfolders in app/modules/
+    for module_name in os.listdir(modules_base_path):
+        module_path = os.path.join(modules_base_path, module_name)
+
+        # Only process if it's a directory and not a system folder (__pycache__)
+        if os.path.isdir(module_path) and not module_name.startswith("__"):
+            try:
+                # Dynamically load the module's routers.py file: app.modules.{module_name}.routers
+                # from .modules.auth.routers import auth, users
+                module_spec = f"app.modules.{module_name}.routers"
+                module = importlib.import_module(module_spec)
+
+                # Check if the module has a variable 'routers' before registering it.
+                if hasattr(module, "router"):
+                    app.include_router(module.router, prefix=settings.API_V1_STR)
+                    print(f"✅ Module connected: {module_name}")
+                else:
+                    print(f"⚠️ The module {module_name} is missing the variable 'router' in routers.py.")
+
+            except ImportError as e:
+                print(f"❌ Module cannot be loaded {module_name}: {e}")
+
+            except Exception as e:
+                print(f"❌ Error when registering the module {module_name}: {e}")
+
+
+# Activate module scanning upon app launch.
+load_modules()
+
 # -----------------------------------------------------------------------
 # ROUTERS
 # -----------------------------------------------------------------------
-
-# Router for JSON APIs
-# app.include_router(audit.router, prefix=settings.API_V1_STR)
-app.include_router(auth.router, prefix=settings.API_V1_STR)
-# app.include_router(documents.router, prefix=settings.API_V1_STR)
-app.include_router(users.router, prefix=settings.API_V1_STR)
 
 # Router for HTML/Web (HTMX)
 # Note: Web routes should generally not have the API prefix
