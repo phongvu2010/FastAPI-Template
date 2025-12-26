@@ -1,5 +1,85 @@
 SecureDoc-Flow/
 ├── app/
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py               # Quản lý settings, Google Client ID/Secret
+│   │   ├── db.py                   # Cấu hình kết nối DB
+│   │   ├── deps.py
+│   │   └── security.py             # Logic xử lý Google SSO (ví dụ: xác thực token)
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── mixins.py
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── api/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth.py
+│   │   │   │   └── users.py
+│   │   │   ├── crud/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── users.py
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   └── routers.py
+│   │   ├── documents/
+│   │   └── __init__.py
+│   ├── web/
+│   │   ├── __init__.py
+│   │   ├── utils.py
+│   │   └── views.py
+│   ├── __init__.py
+│   ├── initial_data.py
+│   └── main.py
+├── migration/
+│   ├── versions/
+│   │   ├── .gitkeep
+│   │   └── ...
+│   ├── env.py
+│   ├── README
+│   └── script.py.mako
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── images/
+│   │   └── logo.png
+│   └── js/
+│       ├── admin.js                # Logic riêng cho bảng quản trị
+│       ├── api.js                  # Xử lý fetch, CSRF và thông báo chung
+│       └── profile.js              # Logic riêng cho bảng profile
+├── templates/
+│   ├── admin/
+│   │   └── admin_panel.html
+│   ├── auth/
+│   │   ├── login.html
+│   │   └── profile.html
+│   ├── base.html
+│   ├── dashboard.html
+│   └── error_page.html
+├── .dockerignore
+├── .env
+├── .gitignore
+├── alembic.ini
+├── docker-compose.yml
+├── Dockerfile
+├── prestart.sh
+├── README.md
+└── requirements.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+SecureDoc-Flow/
+├── app/
 │   ├── alembic/
 │   │   ├── versions/
 │   │   │   └── .gitkeep

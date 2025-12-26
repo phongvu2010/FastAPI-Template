@@ -44,7 +44,7 @@
                                      src="{{ user.picture_url or 'https://ui-avatars.com/api/?name=' + user.full_name }}" 
                                      alt="{{ user.full_name }}">
                                 
-                                <span class="hidden md:block font-medium text-gray-700 truncate max-w-[150px]">
+                                <span id="nav-user-name" class="hidden md:block font-medium text-gray-700 truncate max-w-[150px]">
                                     {{ user.full_name or user.email }}
                                 </span>
                                 

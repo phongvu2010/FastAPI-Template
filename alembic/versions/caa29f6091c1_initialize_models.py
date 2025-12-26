@@ -1,9 +1,9 @@
 """
 initialize_models
 
-Revision ID: e28531d4cfd7
+Revision ID: caa29f6091c1
 Revises: 
-Create Date: 2025-12-26 14:27:58.804031
+Create Date: 2025-12-26 16:56:04.685309
 """
 from alembic import op
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision = 'e28531d4cfd7'
+revision = 'caa29f6091c1'
 down_revision = None
 branch_labels = None
 depends_on = None

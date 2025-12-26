@@ -13,7 +13,8 @@ BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
 from app.core.config import settings
-from app.modules.auth.models import SQLModel
+from app.core.db import Base
+from app.modules.auth.models import User, Role, UserRoleAssociation
 
 # Alembic Config object
 config = context.config
@@ -22,7 +23,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = SQLModel.metadata
+target_metadata = Base.metadata
 
 
 def get_url():

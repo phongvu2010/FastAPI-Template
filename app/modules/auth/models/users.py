@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import field_validator, model_validator
+from pydantic import field_validator
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
 
-from ....models.mixins import TimestampMixin
+from ....core.db import Base, TimestampMixin
 from .roles import UserRole, UserRoleAssociation
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ DEPARTMENTS = ["BOD", "ACC", "HR", "LEASING", "MKT", "COM", "IT", "ME", "MO"]
 # --- Schemas (Pydantic models) ---
 
 # Shared properties for User models.
-class UserBase(SQLModel):
+class UserBase(Base):
     email: str = Field(index=True, unique=True, nullable=False)
     full_name: Optional[str] = None
     picture_url: Optional[str] = None
@@ -32,17 +32,17 @@ class UserCreateInternal(UserBase):
 
 
 # Properties to receive via API on update status.
-class UserUpdateStatus(SQLModel):
+class UserUpdateStatus(Base):
     is_active: bool
 
 
 # Properties to receive via API on update role.
-class UserUpdateRole(SQLModel):
+class UserUpdateRole(Base):
     role_name: UserRole
 
 
 # Properties to receive via API on update profile.
-class UserUpdateProfile(SQLModel):
+class UserUpdateProfile(Base):
     full_name: Optional[str] = None
     department: Optional[str] = None
     contact_email: Optional[str] = None

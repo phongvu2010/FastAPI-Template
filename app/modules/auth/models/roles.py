@@ -4,7 +4,9 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Enum as SQLAlchemyEnum, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship
+
+from ....core.db import Base
 
 if TYPE_CHECKING:
     from .users import User
@@ -20,7 +22,7 @@ class UserRole(str, Enum):
     ADMIN = "ADMIN"
 
 
-class UserRoleAssociation(SQLModel, table=True):
+class UserRoleAssociation(Base, table=True):
     """
     Many-to-Many association table between Users and Roles.
     """
@@ -52,7 +54,7 @@ class UserRoleAssociation(SQLModel, table=True):
 # --- Schemas (Pydantic models) ---
 
 # Shared properties for Role models.
-class RoleBase(SQLModel):
+class RoleBase(Base):
     name: UserRole = Field(index=True, unique=True)
     description: Optional[str] = None
 
