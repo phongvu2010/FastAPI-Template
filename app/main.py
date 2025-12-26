@@ -16,7 +16,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
 from .core.security import NotAuthenticatedWebException
-from .web import utils, views
 from .core.config import settings
 
 # Setup logging
@@ -79,7 +78,7 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 # Static files serving (e.g., CSS, JS, Images)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 # -----------------------------------------------------------------------
@@ -165,12 +164,3 @@ def load_modules():
 
 # Activate module scanning upon app launch.
 load_modules()
-
-# -----------------------------------------------------------------------
-# ROUTERS
-# -----------------------------------------------------------------------
-
-# Router for HTML/Web (HTMX)
-# Note: Web routes should generally not have the API prefix
-app.include_router(utils.router)
-app.include_router(views.router)
