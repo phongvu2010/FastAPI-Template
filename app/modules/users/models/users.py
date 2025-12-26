@@ -7,7 +7,7 @@ from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship
 
-from ....core.db import Base, TimestampMixin
+from ....core.base_model import Base, TimestampMixin
 from .roles import UserRole, UserRoleAssociation
 
 if TYPE_CHECKING:

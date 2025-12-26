@@ -1,7 +1,6 @@
-from typing import Annotated, Any, List, Literal
-
 from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Annotated, Any, List, Literal
 
 
 def parse_comma_separated(v: Any) -> List[str] | str:

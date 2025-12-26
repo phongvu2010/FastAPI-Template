@@ -15,7 +15,7 @@ from fastapi_csrf_protect.exceptions import CsrfProtectError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
-from .core.security import NotAuthenticatedWebException
+from .core.exceptions import NotAuthenticatedWebException
 from .core.config import settings
 
 # Setup logging

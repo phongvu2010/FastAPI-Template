@@ -1,63 +1,71 @@
 SecureDoc-Flow/
-├── app/
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py               # Quản lý settings, Google Client ID/Secret
-│   │   ├── db.py                   # Cấu hình kết nối DB
-│   │   ├── deps.py
-│   │   └── security.py             # Logic xử lý Google SSO (ví dụ: xác thực token)
-│   ├── models/
-│   │   ├── __init__.py
-│   │   └── mixins.py
-│   ├── modules/
-│   │   ├── auth/
-│   │   │   ├── api/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── auth.py
-│   │   │   │   └── users.py
-│   │   │   ├── crud/
-│   │   │   │   ├── __init__.py
-│   │   │   │   └── users.py
-│   │   │   ├── models/
-│   │   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   └── routers.py
-│   │   ├── documents/
-│   │   └── __init__.py
-│   ├── web/
-│   │   ├── __init__.py
-│   │   ├── utils.py
-│   │   └── views.py
-│   ├── __init__.py
-│   ├── initial_data.py
-│   └── main.py
-├── migration/
+├── alembic/                        # Quản lý migration DB
 │   ├── versions/
 │   │   ├── .gitkeep
 │   │   └── ...
 │   ├── env.py
 │   ├── README
 │   └── script.py.mako
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   ├── images/
-│   │   └── logo.png
-│   └── js/
-│       ├── admin.js                # Logic riêng cho bảng quản trị
-│       ├── api.js                  # Xử lý fetch, CSRF và thông báo chung
-│       └── profile.js              # Logic riêng cho bảng profile
-├── templates/
-│   ├── admin/
-│   │   └── admin_panel.html
-│   ├── auth/
-│   │   ├── login.html
-│   │   └── profile.html
-│   ├── base.html
-│   ├── dashboard.html
-│   └── error_page.html
+│
+├── app/
+│   ├── core/                       # [CORE-PLATFORM] - Độc lập tuyệt đối
+│   │   ├── __init__.py
+│   │   ├── base_model.py           # Abstract DB Model (TimestampMixin, etc.)
+│   │   ├── config.py               # Quản lý settings, Google Client ID/Secret
+│   │   ├── database.py             # SQLAlchemy Engine & SessionLocal
+│   │   ├── events.py               # Event Bus (Quan trọng cho Audit Log)
+│   │   ├── exceptions.py           # Custom Exception Handlers
+│   │   └── security.py             # Base JWT logic, Password hashing
+│   │
+│   ├── modules/
+│   │   ├── users/                  # [USERS] - Phụ thuộc: Core
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py           # User Model
+│   │   │   ├── schemas.py          # Pydantic (UserCreate, UserResponse)
+│   │   │   ├── services.py         # Logic Google SSO, Onboarding
+│   │   │   ├── router.py           # API Endpoints
+│   │   │   └── dependencies.py     # GetCurrentUser, PermissionChecker
+│   │   │
+│   │   ├── documents/              # [DOCUMENTS] - Phụ thuộc: Core, Users
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py           # Document Metadata
+│   │   │   ├── services.py         # Hashing [cite: 153], State Machine 
+│   │   │   ├── router.py
+│   │   │   └── utils.py            # PDF Processing logic
+│   │   │
+│   │   └── audit/                  # [AUDIT-LOGS] - Phụ thuộc: Core
+│   │       ├── __init__.py
+│   │       ├── models.py           # AuditLog Model (Immutable)
+│   │       ├── listeners.py        # Lắng nghe sự kiện từ Event Bus
+│   │       └── services.py         # Ghi log bất biến
+│   │
+│   ├── static/                     # CSS/JS/Images
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   ├── images/
+│   │   │   └── logo.png
+│   │   └── js/
+│   │       ├── admin.js            # Logic riêng cho bảng quản trị
+│   │       ├── api.js              # Xử lý fetch, CSRF và thông báo chung
+│   │       └── profile.js          # Logic riêng cho bảng profile
+│   │
+│   ├── templates/                  # Jinja2 Templates (Global hoặc chia theo module)
+│   │   ├── admin/                  # Templates cho Admin Panel
+│   │   │   └── admin_panel.html
+│   │   ├── auth/                   # Templates cho Users
+│   │   │   ├── login.html
+│   │   │   └── profile.html
+│   │   ├── documents/              # Templates cho Documents
+│   │   ├── _layout.html            # Base template
+│   │   ├── dashboard.html
+│   │   └── error_page.html
+│   │
+│   ├── __init__.py
+│   ├── initial_data.py
+│   └── main.py                     # Entry point, load các router
+│
 ├── .dockerignore
-├── .env
+├── .env                            # Environment variables
 ├── .gitignore
 ├── alembic.ini
 ├── docker-compose.yml
@@ -78,77 +86,34 @@ SecureDoc-Flow/
 
 
 
-SecureDoc-Flow/
-├── app/
-│   ├── alembic/
-│   │   ├── versions/
-│   │   │   └── .gitkeep
-│   │   ├── env.py
-│   │   ├── README
-│   │   └── script.py.mako
-│   ├── api/                        # Quản lý các endpoints
-│   │   ├── v1/                     # Phiên bản API
+
+
+
+
+
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── api/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth.py
+│   │   │   │   └── users.py
+│   │   │   ├── crud/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── crud_user.py
+│   │   │   ├── models/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── roles.py
+│   │   │   │   └── users.py
+│   │   │   ├── services/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── auth_service.py
 │   │   │   ├── __init__.py
-│   │   │   ├── audit.py            # Endpoints cho /audit
-│   │   │   ├── auth.py             # Endpoints cho /auth
-│   │   │   ├── documents.py        # Endpoints cho /documents 
-│   │   │   ├── users.py            # Endpoints cho /users
-│   │   │   └── utils.py            # Endpoints cho /utils
-│   │   ├── __init__.py
-│   │   └── deps.py                 # Chứa dependencies
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config.py               # Quản lý settings, Google Client ID/Secret
-│   │   ├── db.py                   # Cấu hình kết nối DB
-│   │   ├── security.py             # Logic xử lý Google SSO (ví dụ: xác thực token)
-│   │   └── signing.py              # Logic ký số nội bộ (dùng crypto)
-│   ├── crud/
-│   │   ├── __init__.py
-│   │   ├── crud_audit.py
-│   │   ├── crud_document.py
-│   │   └── crud_user.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── mixins.py
-│   │   ├── audits.py
-│   │   ├── documents.py
-│   │   ├── roles.py
-│   │   └── users.py
-│   ├── services/
-│   │   ├── __init__.py
-│   │   └── auth_service.py
-│   ├── tasks/
+│   │   │   ├── deps.py
+│   │   │   └── router.py
+│   │   ├── documents/
+│   │   ├── web/
+│   │   │   ├── __init__.py
+│   │   │   ├── router.py
+│   │   │   ├── utils.py
+│   │   │   └── views.py
 │   │   └── __init__.py
-│   ├── web/
-│   │   ├── __init__.py
-│   │   └── views.py                # Endpoints cho frontend
-│   ├── __init__.py
-│   ├── initial_data.py
-│   └── main.py                     # Ứng dụng FastAPI chính
-├── scripts/
-│   └── prestart.sh
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   ├── images/
-│   │   └── logo.png
-│   └── js/
-│       ├── admin.js                # Logic riêng cho bảng quản trị
-│       ├── api.js                  # Xử lý fetch, CSRF và thông báo chung
-│       └── profile.js              # Logic riêng cho bảng profile
-├── templates/
-│   ├── admin/
-│   │   └── admin_panel.html
-│   ├── auth/
-│   │   └── login.html
-│   ├── base.html
-│   ├── dashboard.html
-│   ├── error_page.html
-│   └── profile.html
-├── .dockerignore
-├── .env
-├── .gitignore
-├── alembic.ini
-├── docker-compose.yml
-├── Dockerfile
-└── requirements.txt

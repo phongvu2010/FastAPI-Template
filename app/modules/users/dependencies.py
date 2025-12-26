@@ -1,13 +1,13 @@
 import logging
-from typing import Annotated, Optional
 
 from fastapi import Cookie, Depends, HTTPException, status
 from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated, Optional
 
 from ...core.config import settings
-from ...core.security import NotAuthenticatedWebException
-from ...core.db import get_db
+from ...core.database import get_db
+from ...core.exceptions import NotAuthenticatedWebException
 from ...core.security import decode_access_token
 from .crud import crud_user as crud
 from .models import User, UserRole

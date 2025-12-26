@@ -1,15 +1,15 @@
 import asyncio
+import httpx
 import logging
 import secrets
-from datetime import datetime, timedelta, timezone
-from typing import Any
-from urllib.parse import urlencode
 
-import httpx
+from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from jose import JWTError, jwt
+from typing import Any
+from urllib.parse import urlencode
 
 from .config import settings
 
@@ -18,17 +18,6 @@ logger = logging.getLogger(__name__)
 # Google OAuth Constant URLs
 GOOGLE_OAUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
-
-
-class NotAuthenticatedWebException(HTTPException):
-    """
-    Custom exception raised when a web user is not authenticated.
-    """
-    def __init__(self) -> None:
-        super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authenticated for web content",
-        )
 
 
 # --- Google OAuth & CSRF Utilities ---

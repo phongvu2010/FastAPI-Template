@@ -1,13 +1,13 @@
 import asyncio
 import logging
-from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.engine import Connection
 from sqlmodel import Session
+from typing import Sequence
 
-from app.core.db import engine
-from app.modules.auth.models.roles import Role, RoleCreate, UserRole
+from app.core.database import engine
+from app.modules.users.models.roles import Role, RoleCreate, UserRole
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

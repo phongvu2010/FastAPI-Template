@@ -6,7 +6,7 @@ from sqlalchemy import Column, Enum as SQLAlchemyEnum, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship
 
-from ....core.db import Base
+from ....core.base_model import Base
 
 if TYPE_CHECKING:
     from .users import User

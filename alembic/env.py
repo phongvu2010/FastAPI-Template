@@ -1,9 +1,9 @@
 import asyncio
 import pathlib
 import sys
-from logging.config import fileConfig
 
 from alembic import context
+from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
+from app.core.base_model import Base
 from app.core.config import settings
-from app.core.db import Base
-from app.modules.auth.models import User, Role, UserRoleAssociation
+from app.modules.users.models import User, Role, UserRoleAssociation
 
 # Alembic Config object
 config = context.config

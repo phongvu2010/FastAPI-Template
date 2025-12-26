@@ -1,8 +1,8 @@
 import logging
-from urllib.parse import urlparse
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from urllib.parse import urlparse
 
 from ....core import security
 from ....core.config import settings
