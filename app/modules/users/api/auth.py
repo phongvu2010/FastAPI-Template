@@ -5,11 +5,11 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 
-from .....core import security
-from .....core.config import settings
-from .....core.database import get_db
-from ....web.views import render_error_response
-from ...services.auth_service import AuthService
+from ....core import security
+from ....core.config import settings
+from ....core.database import get_db
+from ...web.api.views import render_error_response
+from ..services import AuthService
 
 router = APIRouter(tags=["auth"])
 logger = logging.getLogger(__name__)

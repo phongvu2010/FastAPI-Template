@@ -5,12 +5,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..users.dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
-from ...core.config import settings
-from ...core.database import get_db
-from ..users.crud import crud_user as crud
-from ..users.models import UserRole, User
-from ..users.models.user import DEPARTMENTS
+from ...users.dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
+from ....core.config import settings
+from ....core.database import get_db
+from ...users import crud as crud
+from ...users.models import UserRole, User
+from ...users.models.user import DEPARTMENTS
 
 router = APIRouter(tags=["frontend"])
 templates = Jinja2Templates(directory="app/templates")

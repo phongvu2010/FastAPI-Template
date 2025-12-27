@@ -9,7 +9,7 @@ from ...core.config import settings
 from ...core.database import get_db
 from ...core.exceptions import NotAuthenticatedWebException
 from ...core.security import decode_access_token
-from .crud import crud_user as crud
+from . import crud as crud
 from .models import User, UserRole
 
 # Setup logger

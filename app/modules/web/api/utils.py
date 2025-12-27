@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
-from ...core.config import settings
+from ....core.config import settings
 
 router = APIRouter(tags=["utils"])
 

@@ -4,10 +4,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from urllib.parse import urlparse
 
-from ....core import security
-from ....core.config import settings
-from ..crud import crud_user as crud
-from ..models import User, UserCreateInternal, UserRole
+from ...core import security
+from ...core.config import settings
+from . import crud as crud
+from .models import User, UserCreateInternal, UserRole
 
 logger = logging.getLogger(__name__)
 
