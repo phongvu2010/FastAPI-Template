@@ -7,7 +7,7 @@ from sqlmodel import Session
 from typing import Sequence
 
 from app.core.database import engine
-from app.modules.users.models.roles import Role, RoleCreate, UserRole
+from app.modules.users.models.role import Role, RoleCreate, UserRole
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

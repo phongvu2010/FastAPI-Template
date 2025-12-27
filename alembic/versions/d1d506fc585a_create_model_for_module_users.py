@@ -1,9 +1,9 @@
 """
-initialize_models
+create_model_for_module_users
 
-Revision ID: 3c4c3e8940b1
+Revision ID: d1d506fc585a
 Revises: 
-Create Date: 2025-12-26 23:40:31.161521
+Create Date: 2025-12-27 15:50:32.100233
 """
 from alembic import op
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision = '3c4c3e8940b1'
+revision = 'd1d506fc585a'
 down_revision = None
 branch_labels = None
 depends_on = None

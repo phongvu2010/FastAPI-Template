@@ -145,7 +145,7 @@ def load_modules():
             try:
                 # Dynamically load the module's routers.py file: app.modules.{module_name}.routers
                 # from .modules.auth.routers import auth, users
-                module_spec = f"app.modules.{module_name}.routers"
+                module_spec = f"app.modules.{module_name}.router"
                 module = importlib.import_module(module_spec)
 
                 # Check if the module has a variable 'routers' before registering it.

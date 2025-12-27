@@ -8,10 +8,10 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship
 
 from ....core.base_model import Base, TimestampMixin
-from .roles import UserRole, UserRoleAssociation
+from .role import UserRole, UserRoleAssociation
 
 if TYPE_CHECKING:
-    from .roles import Role, RoleRead
+    from .role import Role, RoleRead
 
 DEPARTMENTS = ["BOD", "ACC", "HR", "LEASING", "MKT", "COM", "IT", "ME", "MO"]
 

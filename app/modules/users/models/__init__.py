@@ -1,8 +1,8 @@
 from sqlmodel import SQLModel
 
 # Export core models and schemas for easy access throughout the app
-from .roles import Role, RoleCreate, RoleRead, UserRole, UserRoleAssociation
-from .users import (
+from .role import Role, RoleCreate, RoleRead, UserRole, UserRoleAssociation
+from .user import (
     User,
     UserCreateInternal,
     UserRead,

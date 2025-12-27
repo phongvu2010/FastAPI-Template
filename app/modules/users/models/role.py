@@ -9,7 +9,7 @@ from sqlmodel import Field, Relationship
 from ....core.base_model import Base
 
 if TYPE_CHECKING:
-    from .users import User
+    from .user import User
 
 
 class UserRole(str, Enum):

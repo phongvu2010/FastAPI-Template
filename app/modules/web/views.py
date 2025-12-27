@@ -10,7 +10,7 @@ from ...core.config import settings
 from ...core.database import get_db
 from ..users.crud import crud_user as crud
 from ..users.models import UserRole, User
-from ..users.models.users import DEPARTMENTS
+from ..users.models.user import DEPARTMENTS
 
 router = APIRouter(tags=["frontend"])
 templates = Jinja2Templates(directory="app/templates")
