@@ -10,12 +10,15 @@ SecureDoc-Flow/
 ├── app/
 │   ├── core/                           # [CORE-PLATFORM] - Độc lập tuyệt đối
 │   │   ├── __init__.py
-│   │   ├── base_model.py               # Abstract DB Model (TimestampMixin, etc.)
 │   │   ├── config.py                   # Quản lý settings, Google Client ID/Secret
-│   │   ├── database.py                 # SQLAlchemy Engine & SessionLocal
 │   │   ├── events.py                   # Event Bus (Quan trọng cho Audit Log)
 │   │   ├── exceptions.py               # Custom Exception Handlers
+│   │   ├── module_loader.py            # Load modules từ thư mục /app/modules/
 │   │   └── security.py                 # Base JWT logic, Password hashing
+│   │
+│   ├── db/                             # [CORE-PLATFORM]
+│   │   ├── base_model.py               # Abstract DB Model (TimestampMixin, etc.)
+│   │   └── database.py                 # SQLAlchemy Engine & SessionLocal
 │   │
 │   ├── modules/
 │   │   ├── users/                      # [USERS] - Phụ thuộc: Core
@@ -23,10 +26,21 @@ SecureDoc-Flow/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── auth.py
 │   │   │   │   └── users.py
+│   │   │   │   └── views.py
 │   │   │   ├── models/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── role.py             # Role Model & Pydantic
 │   │   │   │   └── user.py             # User Model & Pydantic
+│   │   │   ├── static/
+│   │   │   │   └── js/
+│   │   │   │       ├── admin.js                # Logic riêng cho bảng quản trị
+│   │   │   │       └── profile.js              # Logic riêng cho bảng profile
+│   │   │   ├── templates/
+│   │   │   │   ├── admin/                  # Templates cho Admin Panel
+│   │   │   │   │   └── admin_panel.html
+│   │   │   │   └── auth/                   # Templates cho Users
+│   │   │   │       ├── login.html
+│   │   │   │       └── profile.html
 │   │   │   ├── __init__.py
 │   │   │   ├── crud.py
 │   │   │   ├── dependencies.py         # GetCurrentUser, PermissionChecker
@@ -43,10 +57,14 @@ SecureDoc-Flow/
 │   │   │   ├── utils/                  # PDF Processing logic
 │   │   │   │   ├── __init__.py
 │   │   │   │   └── ...
+│   │   │   ├── static/
+│   │   │   ├── templates/              # Templates cho Documents
+│   │   │   │   ├── dashboard.html
+│   │   │   │   └── ...
 │   │   │   ├── __init__.py
 │   │   │   ├── crud.py
 │   │   │   ├── main.py                 # Main router
-│   │   │   └── services.py             # Hashing, State Machine 
+│   │   │   └── services.py             # Hashing, State Machine
 │   │   │
 │   │   └── audit/                      # [AUDIT-LOGS] - Phụ thuộc: Core
 │   │       ├── __init__.py
@@ -60,19 +78,10 @@ SecureDoc-Flow/
 │   │   ├── images/
 │   │   │   └── logo.png
 │   │   └── js/
-│   │       ├── admin.js                # Logic riêng cho bảng quản trị
-│   │       ├── api.js                  # Xử lý fetch, CSRF và thông báo chung
-│   │       └── profile.js              # Logic riêng cho bảng profile
+│   │       └── api.js                  # Xử lý fetch, CSRF và thông báo chung
 │   │
 │   ├── templates/                  # Jinja2 Templates (Global hoặc chia theo module)
-│   │   ├── admin/                  # Templates cho Admin Panel
-│   │   │   └── admin_panel.html
-│   │   ├── auth/                   # Templates cho Users
-│   │   │   ├── login.html
-│   │   │   └── profile.html
-│   │   ├── documents/              # Templates cho Documents
 │   │   ├── _layout.html            # Base template
-│   │   ├── dashboard.html
 │   │   └── error_page.html
 │   │
 │   ├── __init__.py
