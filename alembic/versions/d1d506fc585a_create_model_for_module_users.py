@@ -41,7 +41,7 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_users_contact_email'), 'users', ['contact_email'], unique=True)
+    op.create_index(op.f('ix_users_contact_email'), 'users', ['contact_email'], unique=False)
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_google_sub'), 'users', ['google_sub'], unique=True)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)

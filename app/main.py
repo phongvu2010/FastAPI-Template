@@ -3,7 +3,6 @@
 
 import importlib
 import logging
-# import sentry_sdk
 import os
 
 from fastapi import FastAPI, Request, status
@@ -21,18 +20,10 @@ from .core.config import settings
 # Setup logging
 logger = logging.getLogger(__name__)
 
-# -----------------------------------------------------------------------
-# SENTRY CONFIGURATION (Optional)
-# -----------------------------------------------------------------------
-
-# if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
-#     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
-
 
 # -----------------------------------------------------------------------
 # CSRF CONFIGURATION
 # -----------------------------------------------------------------------
-
 @CsrfProtect.load_config
 def load_csrf_config():
     """
@@ -50,24 +41,24 @@ def load_csrf_config():
 # -----------------------------------------------------------------------
 # APP INITIALIZATION
 # -----------------------------------------------------------------------
-
 def custom_generate_unique_id(route: APIRoute) -> str:
     """
     Generates unique operation IDs for OpenAPI.
     """
-    return f"{route.tags[0]}-{route.name}"
+    tag = route.tags[0] if route.tags else "default"
+    return f"{tag}-{route.name}"
 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    docs_url=f"{settings.API_V1_STR}/docs",
     generate_unique_id_function=custom_generate_unique_id,
 )
 
 # -----------------------------------------------------------------------
 # MIDDLEWARE
 # -----------------------------------------------------------------------
-
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -84,7 +75,6 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # -----------------------------------------------------------------------
 # EXCEPTION HANDLERS
 # -----------------------------------------------------------------------
-
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     """
@@ -164,3 +154,8 @@ def load_modules():
 
 # Activate module scanning upon app launch.
 load_modules()
+
+
+# -----------------------------------------------------------------------
+# ROUTERS HELPER
+# -----------------------------------------------------------------------

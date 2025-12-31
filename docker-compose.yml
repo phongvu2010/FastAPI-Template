@@ -2,6 +2,7 @@ services:
   # --- 1. Dịch vụ Cơ sở Dữ liệu (PostgreSQL) ---
   db:
     image: postgres:17
+    container_name: db
     # volumes:
     #   - postgres_data:/var/lib/postgresql/data
     environment:
@@ -33,12 +34,13 @@ services:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     networks:
       - app_network
-    command: tunnel --no-autoupdate run
     restart: always
+    command: tunnel --no-autoupdate run
 
   # --- 3. Khởi tạo database ---
   prestart:
     build: .
+    container_name: prestart
     env_file:
       - .env
     networks:
@@ -52,6 +54,7 @@ services:
   # --- 4. Dịch vụ Ứng dụng (FastAPI) ---
   app:
     build: .
+    container_name: app
     volumes: # Khi sử dụng Dockerfile.Production thì disable volumes
       - ./app:/src/app
     env_file:
@@ -60,16 +63,15 @@ services:
       - app_network
     ports:
       - 8000:8000
-    # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
-    # --reload: Tự động tải lại server khi code thay đổi
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload #--workers 4
     restart: always
+    # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload #--workers 4
     depends_on:
       db:
         condition: service_healthy
         restart: true
-      # prestart:
-      #   condition: service_completed_successfully
+      prestart:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health"]
       interval: 10s

@@ -102,5 +102,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/admin.js"></script>
+<script src="{{ url_for('static', path='js/admin.js') }}"></script>
 {% endblock %}

@@ -1,66 +1,145 @@
-# 1. KHẮC PHỤC LỖI ENCODING TRÊN WINDOWS
-# Ép xung đầu ra sử dụng UTF-8 để hiển thị được Emoji (✅, ❌)
+#!/usr/bin/env python
+import io
+import subprocess
+import sys
+from typing import List, Dict, Optional
+
+# --- CẤU HÌNH ---
+# Định nghĩa các vùng cho phép commit dựa trên tên nhánh
+ALLOWED_ZONES: Dict[str, List[str]] = {
+    "main": [""],  # Chuỗi rỗng nghĩa là cho phép tất cả
+    "core/base-platform": [
+        "alembic/",
+        "app/core/",
+        "app/db/",
+        "app/static/",
+        "app/templates/",
+        "app/__init__.py",
+        "app/main.py",
+        "alembic.ini",
+        "docker-compose.yml",
+        "Dockerfile",
+        "prestart.sh",
+        "requirements.txt",
+    ],
+    "feature/users-module": [
+        "app/modules/users/",
+        "app/initial_data.py",
+    ],
+    "feature/documents-module": [
+        "app/modules/documents/",
+    ],
+    # Lưu ý: Logic gốc map audit-logs vào documents, giữ nguyên theo yêu cầu
+    "feature/audit-logs-module": [
+        "app/modules/documents/",
+    ],
+}
 
 
-# def get_current_branch():
-#     try:
-#         return subprocess.check_output(
-#             ["git", "symbolic-ref", "--short", "HEAD"],
-#             stderr=subprocess.DEVNULL,
-#         ).decode("utf-8").strip()
-#     except subprocess.CalledProcessError:
-#         return ""
+# --- CÁC HÀM HỖ TRỢ (HELPER FUNCTIONS) ---
+def setup_console_encoding() -> None:
+    """
+    Thiết lập encoding UTF-8 cho stdout/stderr để hiển thị Emoji đúng trên Windows.
+    """
+    if sys.stdout.encoding != "utf-8":
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
-# def get_staged_files():
-#     return subprocess.check_output(
-#         ["git", "diff", "--cached", "--name-only"]
-#     ).decode("utf-8").splitlines()
-
-# # 2. CẤU HÌNH VÙNG CHO PHÉP (ALLOW-LIST)
+    if sys.stderr.encoding != "utf-8":
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 
-# def is_allowed(file_path, allowed_paths):
-#     for allowed in allowed_paths:
-#         # Nếu rule là "" (chuỗi rỗng) thì cho phép tất cả
-#         if allowed == "" or file_path.startswith(allowed):
-#             return True
-#     return False
+def run_git_cmd(args: List[str]) -> str:
+    """
+    Thực thi lệnh git và trả về kết quả dưới dạng chuỗi UTF-8.
+    """
+    try:
+        return subprocess.check_output(
+            args, stderr=subprocess.DEVNULL
+        ).decode("utf-8").strip()
+    except subprocess.CalledProcessError:
+        return ""
 
-# def main():
-#     branch = get_current_branch()
-#     files_changed = get_staged_files()
 
-#     # Nếu không có file nào đang staged, cho phép commit (thường là commit --amend hoặc empty)
-#     if not files_changed:
-#         sys.exit(0)
+def get_current_branch() -> str:
+    """
+    Lấy tên nhánh git hiện tại.
+    """
+    return run_git_cmd(["git", "symbolic-ref", "--short", "HEAD"])
 
-#     # Tìm quy tắc áp dụng cho nhánh hiện tại
-#     matched_branch = None
-#     for rule_branch in ALLOWED_ZONES:
-#         if branch == rule_branch or branch.startswith(rule_branch):
-#             matched_branch = rule_branch
-#             break
 
-#     # Nếu nhánh không nằm trong danh sách cấu hình -> Chặn commit
-#     if not matched_branch:
-#         print(f"❌ LỖI: Nhánh '{branch}' không có quyền commit vào bất kỳ file nào.")
-#         sys.exit(1)
+def get_staged_files() -> List[str]:
+    """
+    Lấy danh sách các file đang trong trạng thái staged.
+    """
+    output = run_git_cmd(["git", "diff", "--cached", "--name-only"])
+    return output.splitlines() if output else []
 
-#     allowed_paths = ALLOWED_ZONES[matched_branch]
-#     violations = [f for f in files_changed if not is_allowed(f, allowed_paths)]
 
-#     if violations:
-#         print(f"\n🔒 COMMIT BỊ CHẶN TRÊN NHÁNH: {branch}")
-#         print("Bạn đang cố gắng commit các file ngoài phạm vi cho phép:")
-#         for v in violations:
-#             print(f"  ❌ {v}")
+def get_allowed_paths_for_branch(branch: str) -> Optional[List[str]]:
+    """
+    Tìm danh sách đường dẫn cho phép dựa trên tên nhánh hiện tại.
+    Hỗ trợ khớp chính xác hoặc khớp tiền tố (prefix).
+    """
+    for rule_branch, paths in ALLOWED_ZONES.items():
+        if branch == rule_branch or branch.startswith(rule_branch):
+            return paths
 
-#         print("\n✅ Các đường dẫn được phép cho nhánh này:")
-#         for p in allowed_paths:
-#             print(f"  - {p or '(TẤT CẢ)'}")
+    return None
 
-#         print("\n👉 Vui lòng unstage hoặc revert các file không hợp lệ.")
-#         sys.exit(1)
 
-#     print(f"✅ Hợp lệ! Cho phép commit trên nhánh '{branch}'")
-#     sys.exit(0)
+def is_path_allowed(file_path: str, allowed_paths: List[str]) -> bool:
+    """
+    Kiểm tra xem file có nằm trong danh sách đường dẫn cho phép hay không.
+    """
+    for allowed in allowed_paths:
+        # Nếu rule là chuỗi rỗng "", cho phép tất cả
+        if allowed == "" or file_path.startswith(allowed):
+            return True
+
+    return False
+
+
+# --- HÀM CHÍNH (MAIN) ---
+def main() -> None:
+    """
+    Luồng xử lý chính của hook.
+    """
+    setup_console_encoding()
+
+    branch = get_current_branch()
+    files_changed = get_staged_files()
+
+    # Nếu không có file nào staged (vd: commit rỗng), cho qua
+    if not files_changed:
+        sys.exit(0)
+
+    allowed_paths = get_allowed_paths_for_branch(branch)
+
+    # Trường hợp 1: Nhánh không được cấu hình trong hệ thống
+    if allowed_paths is None:
+        print(f"❌ LỖI: Nhánh '{branch}' không có quyền commit vào bất kỳ file nào.")
+        sys.exit(1)
+
+    # Trường hợp 2: Kiểm tra vi phạm
+    violations = [f for f in files_changed if not is_path_allowed(f, allowed_paths)]
+
+    if violations:
+        print(f"\n🔒 COMMIT BỊ CHẶN TRÊN NHÁNH: {branch}")
+        print("Bạn đang cố gắng commit các file ngoài phạm vi cho phép:")
+        for v in violations:
+            print(f"  ❌ {v}")
+
+        print("\n✅ Các đường dẫn được phép cho nhánh này:")
+        for p in allowed_paths:
+            print(f"  - {p if p else '(TẤT CẢ)'}")
+
+        print("\n👉 Vui lòng unstage hoặc revert các file không hợp lệ.")
+        sys.exit(1)
+
+    # Trường hợp 3: Hợp lệ
+    print(f"✅ Hợp lệ! Cho phép commit trên nhánh '{branch}'")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

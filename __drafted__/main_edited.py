@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Optional
 
-from .core.config import settings
+from ..app.core.config import settings
 
 # Setup logging
 logger = logging.getLogger(__name__)

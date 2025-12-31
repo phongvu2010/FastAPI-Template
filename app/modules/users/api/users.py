@@ -1,13 +1,13 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status # Request
 from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ....db.database import get_db
-from .. import crud as crud
+from .. import crud
 from ..dependencies import CurrentUser, require_role
 from ..models import (
     User,
@@ -42,6 +42,7 @@ async def read_all_users(
 
 @router.patch("/me", response_model=UserRead)
 async def update_my_profile(
+    # request: Request,
     profile_in: UserUpdateProfile,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
@@ -50,6 +51,8 @@ async def update_my_profile(
     """
     Updates current user profile.
     """
+    # await csrf_protect.validate_csrf(request)
+
     update_data = profile_in.model_dump(exclude_unset=True)
 
     try:
@@ -69,6 +72,7 @@ async def update_my_profile(
 
 @router.patch("/{user_id}/status", response_model=UserRead)
 async def update_status(
+    # request: Request,
     user_id: UUID,
     status_in: UserUpdateStatus,
     db: AsyncSession = Depends(get_db),
@@ -78,6 +82,9 @@ async def update_status(
     """
     Updates user status (Admin only).
     """
+    # # Validate CSRF Token từ Header 'X-CSRF-Token'
+    # await csrf_protect.validate_csrf(request)
+
     if user_id == current_user.id and not status_in.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -96,6 +103,7 @@ async def update_status(
 
 @router.post("/{user_id}/role", response_model=UserRead)
 async def add_role(
+    # request: Request,
     user_id: UUID,
     role_in: UserUpdateRole,
     db: AsyncSession = Depends(get_db),
@@ -105,6 +113,8 @@ async def add_role(
     """
     Adds a role to a user (Admin only).
     """
+    # await csrf_protect.validate_csrf(request)
+
     user = await crud.get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(
@@ -130,6 +140,7 @@ async def add_role(
 
 @router.delete("/{user_id}/role", response_model=UserRead)
 async def remove_role(
+    # request: Request,
     user_id: UUID,
     role_in: UserUpdateRole,
     db: AsyncSession = Depends(get_db),
@@ -139,6 +150,8 @@ async def remove_role(
     """
     Removes a role from a user (Admin only).
     """
+    # await csrf_protect.validate_csrf(request)
+
     if user_id == current_user.id and role_in.role_name == UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

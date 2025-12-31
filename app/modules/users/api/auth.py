@@ -34,6 +34,7 @@ async def google_login(response: Response):
         httponly=True,
         samesite="lax",
         secure=settings.COOKIE_SECURE,
+        path="/",
     )
     return resp
 
@@ -72,6 +73,10 @@ async def google_callback(
     Handles Google OAuth callback.
     """
     if not code or not state:
+        # raise HTTPException(
+        #     status_code=status.HTTP_400_BAD_REQUEST,
+        #     detail="Missing parameters from Google.",
+        # )
         return render_error_response(
             request,
             title="Authentication Error",
@@ -110,6 +115,10 @@ async def google_callback(
 
     except HTTPException as http_exc:
         logger.warning(f"Auth Error: {http_exc.detail}")
+        # raise HTTPException(
+        #     status_code=http_exc.status_code,
+        #     detail=str(http_exc.detail),
+        # )
         return render_error_response(
             request,
             title="Authentication Failed",
@@ -119,6 +128,10 @@ async def google_callback(
 
     except Exception:
         logger.error("System error during auth callback", exc_info=True)
+        # raise HTTPException(
+        #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     detail="Unexpected error occurred.",
+        # )
         return render_error_response(
             request,
             title="System Error",
