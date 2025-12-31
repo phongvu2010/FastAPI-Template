@@ -5,10 +5,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...users.dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
 from ....core.config import settings
-from ....core.database import get_db
+from ....db.database import get_db
 from ...users import crud as crud
+from ...users.dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
 from ...users.models import UserRole, User
 from ...users.models.user import DEPARTMENTS
 

@@ -17,8 +17,8 @@
 # pip3 freeze > requirements.txt
 
 
-## Package
-alembic # Cho migrations
+## Package for branch core-platform
+alembic
 asyncpg
 fastapi[standard]
 fastapi-csrf-protect
@@ -37,10 +37,8 @@ greenlet
 
 
 
-# FastAPI stack
 # uvicorn[standard]
 # pydantic
-# pydantic-settings # Thay thế cho pydantic-extra-types cho settings/env
 # passlib[bcrypt]
 # psycopg
 # pydantic[email]

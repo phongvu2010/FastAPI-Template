@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     # Google OAuth
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
-    GOOGLE_REDIRECT_URI: AnyUrl
+    GOOGLE_REDIRECT_URI: str
 
     # Security & Auth
     ALLOWED_EMAIL_DOMAINS: Annotated[List[str] | str, BeforeValidator(parse_comma_separated)] = []

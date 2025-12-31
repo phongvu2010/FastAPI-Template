@@ -72,10 +72,8 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 # COPY ./pyproject.toml ./uv.lock ./alembic.ini /src
 COPY --chown=appuser:appuser ./alembic.ini /src
 COPY --chown=appuser:appuser ./prestart.sh /src
+COPY --chown=appuser:appuser ./alembic /src/alembic
 COPY --chown=appuser:appuser ./app /src/app
-COPY --chown=appuser:appuser ./migration /src/migration
-COPY --chown=appuser:appuser ./static /src/static
-COPY --chown=appuser:appuser ./templates /src/templates
 
 # 6. Chuyển sang non-root user để chạy ứng dụng (BEST PRACTICE)
 USER appuser

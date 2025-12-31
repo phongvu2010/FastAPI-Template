@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlmodel import Session
 from typing import Sequence
 
-from app.core.database import engine
+from app.db.database import engine
 from app.modules.users.models.role import Role, RoleCreate, UserRole
 
 logging.basicConfig(level=logging.INFO)

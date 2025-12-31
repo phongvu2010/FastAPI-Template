@@ -21,7 +21,6 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 
 # --- Google OAuth & CSRF Utilities ---
-
 def generate_state_token() -> str:
     """
     Generates a secure, random string for CSRF protection.
@@ -88,7 +87,6 @@ async def get_google_user_info_async(id_token_str: str) -> dict[str, Any]:
 
 
 # --- Internal JWT Utilities ---
-
 def create_access_token(user_id: str) -> str:
     """
     Creates an internal JWT access token.
