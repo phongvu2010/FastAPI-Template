@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ....core.config import settings
 from ....db.database import get_db
-from ...users import crud as crud
-from ...users.dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
-from ...users.models import UserRole, User
-from ...users.models.user import DEPARTMENTS
+from .. import crud as crud
+from ..dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
+from ..models import UserRole, User
+from ..models.user import DEPARTMENTS
 
 router = APIRouter(tags=["frontend"])
 templates = Jinja2Templates(directory="app/templates")

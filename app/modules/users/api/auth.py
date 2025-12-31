@@ -8,8 +8,8 @@ from typing import Optional
 from ....core import security
 from ....core.config import settings
 from ....db.database import get_db
-from ...web.api.views import render_error_response
 from ..services import AuthService
+from .views import render_error_response
 
 router = APIRouter(tags=["auth"])
 logger = logging.getLogger(__name__)
