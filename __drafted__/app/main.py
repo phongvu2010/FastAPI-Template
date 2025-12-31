@@ -1,8 +1,6 @@
-from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 
-from .core.module_loader import discover_modules
 from .core.user_registry import user_registry
 
 
@@ -73,49 +71,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-def load_app_modules(app):
-    """
-    Automatically scan the app/modules/ directory and register APIRouters.
-    Each module must have a 'router.py' file containing the 'router' variable.
-    """
-    # 1. Discover and load modules (users, documents, v.v...)
-    modules = discover_modules(target_submodule="main")
-    for module in modules:
-        # Get the module name (e.g., 'users' from 'app.modules.users.main')
-        try:
-            module_parts = module.__name__.split('.')
-            module_name = module_parts[-2] 
-        except IndexError:
-            continue
-
-        # Check if the module has a variable 'routers' before registering it.
-        if hasattr(module, "router"):
-            app.include_router(module.router)
-            logger.info(f"✅ Router connected: `{module_name}`")
-        else:
-            logger.warning(f"⚠️ Router `{module_name}` is missing a 'router' object in main.py")
-
-        # 3. Automatically mount each module's static.
-        module_static_dir = os.path.join("app", "modules", module_name, "static")
-        if os.path.exists(module_static_dir):
-            # Mount to the URL path: /static/users
-            mount_path = f"/static/{module_name}"
-            app.mount(mount_path, StaticFiles(directory=module_static_dir), name=f"static_{module_name}")
-            logger.info(f"📁 Mounted module static: {mount_path} -> {module_static_dir}")
-        else:
-            # Log này giúp bạn biết vì sao không load được file js
-            logger.debug(f"ℹ️ No static folder found for module: {module_name}")
-
-    # 2. Mount Global Static (For shared CSS/JS)
-    global_static_path = os.path.join(os.path.dirname(__file__), "static")
-    if os.path.exists(global_static_path):
-        app.mount("/static", StaticFiles(directory=global_static_path), name="static_global")
-        logger.info(f"🚀 Mounted Global Static: /static -> {global_static_path}")
-
-
-load_app_modules(app)
-
-
 @app.get("/error", response_class=HTMLResponse, name="error_page")
 async def error_page(
     request: Request,
@@ -143,31 +98,3 @@ async def error_page(
         },
         status_code=status_code,
     )
-
-
-@app.get("/health", response_class=HTMLResponse)
-async def health(request: Request):
-    """
-    Basic endpoint for testing an application.
-    """
-    current_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS]
-
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{request.app.title}</title>
-    </head>
-    <body>
-        <h1>Chào mừng đến với {request.app.title}!</h1>
-        <p>Phiên bản: {request.app.version}</p>
-        <p><strong>Origins được phép (từ config):</strong> <code>{current_origins}</code></p>
-        <p>Kiểm tra API docs tại: <a href="/docs">/docs</a></p>
-        <h2>Trạng thái Router:</h2>
-        <ul>
-            <li><strong>API Router</strong> được gắn vào <code>{settings.API_V1_STR}</code></li>
-            <li><strong>Web/HTMX Router</strong> được gắn vào <code>/</code></li>
-        </ul>
-    </body>
-    </html>
-    """

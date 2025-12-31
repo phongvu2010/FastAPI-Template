@@ -12,9 +12,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
-from app.db.base_model import Base
 from app.core.config import settings
-from app.modules.users.models import User, Role, UserRoleAssociation
+from app.core.module_loader import discover_modules
+from app.db.base_model import Base
+
+# Automatically load all models from modules so Alembic can recognize target_metadata
+discover_modules(target_submodule="models")
 
 # Alembic Config object
 config = context.config
