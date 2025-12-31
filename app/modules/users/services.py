@@ -2,7 +2,6 @@ import logging
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from urllib.parse import urlparse
 
 from ...core import security
 from ...core.config import settings
@@ -68,7 +67,7 @@ class AuthService:
 
         # 4. Domain Validation
         if settings.ALLOWED_EMAIL_DOMAINS:
-            domain = urlparse(f"http://{email}").netloc.split("@")[-1]
+            domain = email.split("@")[-1]
             if domain not in settings.ALLOWED_EMAIL_DOMAINS:
                 logger.warning(f"Login rejected for domain: {email}")
                 raise HTTPException(
@@ -84,6 +83,7 @@ class AuthService:
                 email=email,
                 full_name=user_info.get("name"),
                 picture_url=user_info.get("picture"),
+                # is_active=True, # <--- RECOMMENDATION: By default, allow new users to log on immediately.
             )
 
             # Determine initial role

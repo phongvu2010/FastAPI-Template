@@ -54,8 +54,6 @@ services:
     build: .
     volumes: # Khi sử dụng Dockerfile.Production thì disable volumes
       - ./app:/src/app
-      - ./static:/src/static
-      - ./templates:/src/templates
     env_file:
       - .env
     networks:
@@ -70,8 +68,8 @@ services:
       db:
         condition: service_healthy
         restart: true
-      prestart:
-        condition: service_completed_successfully
+      # prestart:
+      #   condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health"]
       interval: 10s

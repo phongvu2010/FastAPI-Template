@@ -7,7 +7,7 @@ from sqlmodel import Session
 from typing import Sequence
 
 from app.db.database import engine
-from app.modules.users.models.role import Role, RoleCreate, UserRole
+from app.modules.users.models import RoleCreate, UserRole, Role
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +47,7 @@ def create_default_roles(conn: Connection) -> None:
                 logger.info(f" Created default role: {role.name.value}")
             else:
                 logger.info(f" Role already exists: {role_data.name.value}")
+
         session.commit()
 
 

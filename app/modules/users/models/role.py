@@ -85,7 +85,7 @@ class Role(RoleBase, table=True):
     # Explicit SQLAlchemy Enum required for Postgres strict handling
     name: UserRole = Field(
         sa_column=Column(
-            SQLAlchemyEnum(UserRole, name="user_role_enum", create_constraint=False),
+            SQLAlchemyEnum(UserRole, name="user_role_enum", create_constraint=False),   # native_enum=False
             unique=True,
             nullable=False,
         ),

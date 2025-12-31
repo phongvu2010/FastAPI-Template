@@ -8,10 +8,10 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlmodel import Field, Relationship
 
 from ....db.base_model import Base, TimestampMixin
-from .role import UserRole, UserRoleAssociation
+from .role import UserRole, UserRoleAssociation, RoleRead
 
 if TYPE_CHECKING:
-    from .role import Role, RoleRead
+    from .role import Role
 
 DEPARTMENTS = ["BOD", "ACC", "HR", "LEASING", "MKT", "COM", "IT", "ME", "MO"]
 
@@ -98,7 +98,7 @@ class User(TimestampMixin, UserBase, table=True):
     # Onboarding/Profile fields
     contact_email: Optional[str] = Field(
         default=None,
-        sa_column=Column(String, unique=True, index=True, nullable=True),
+        sa_column=Column(String, index=True, nullable=True),
     )
 
     department: Optional[str] = Field(default=None)
