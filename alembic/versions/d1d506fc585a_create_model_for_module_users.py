@@ -3,7 +3,7 @@ create_model_for_module_users
 
 Revision ID: d1d506fc585a
 Revises: 
-Create Date: 2025-12-27 15:50:32.100233
+Create Date: 2025-12-31 22:17:09.674206
 """
 from alembic import op
 import sqlalchemy as sa

@@ -52,7 +52,6 @@ def custom_generate_unique_id(route: APIRoute) -> str:
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    docs_url=f"{settings.API_V1_STR}/docs",
     generate_unique_id_function=custom_generate_unique_id,
 )
 
@@ -69,6 +68,7 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 # Static files serving (e.g., CSS, JS, Images)
+app.mount("/static/users", StaticFiles(directory="app/modules/users/static"), name="static_users")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 

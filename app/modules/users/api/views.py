@@ -1,19 +1,28 @@
-from typing import Optional
+import logging
+import os
 
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Request, Response, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
 
 from ....core.config import settings
 from ....db.database import get_db
-from .. import crud as crud
+from .. import crud
 from ..dependencies import CsrfTokenWeb, CurrentUserWeb, get_validated_user_or_none
 from ..models import UserRole, User
 from ..models.user import DEPARTMENTS
 
 router = APIRouter(tags=["frontend"])
-templates = Jinja2Templates(directory="app/templates")
+logger = logging.getLogger(__name__)
+
+# Configure the module to automatically find its own template.
+module_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
+templates = Jinja2Templates(directory=[
+    module_dir,             # Ưu tiên template trong module
+    "app/templates",        # Dự phòng template chung (base.html)
+])
 
 
 def render_error_response(
@@ -102,6 +111,10 @@ async def admin_panel(
     user_role_names = {r.name for r in current_user.roles}
     # Manual Role Check
     if UserRole.ADMIN not in user_role_names:
+        # raise HTTPException(
+        #     status_code=status.HTTP_403_FORBIDDEN,
+        #     detail="Admin privileges required.",
+        # )
         return render_error_response(
             request=request,
             title="Access Forbidden",

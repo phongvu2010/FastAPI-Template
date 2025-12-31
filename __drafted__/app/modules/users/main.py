@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Request
+from fastapi import Request
 
-from ...core.config import settings
 from ...core.user_registry import user_registry
 from ...db.database import AsyncSessionLocal
-from .api import auth, users, views
 from .dependencies import get_validated_user_or_none
 
 
@@ -24,8 +22,3 @@ async def user_loader_for_core(request: Request):
 # 2. Đăng ký hàm này vào Core Registry
 # Khi file này được import bởi module_loader, dòng lệnh này sẽ chạy ngay.
 user_registry.register_loader(user_loader_for_core)
-
-router = APIRouter()
-router.include_router(auth.router, prefix=settings.API_V1_STR)
-router.include_router(users.router, prefix=settings.API_V1_STR)
-router.include_router(views.router)
