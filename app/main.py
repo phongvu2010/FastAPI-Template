@@ -67,10 +67,6 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
-# Static files serving (e.g., CSS, JS, Images)
-app.mount("/static/users", StaticFiles(directory="app/modules/users/static"), name="static_users")
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
 
 # -----------------------------------------------------------------------
 # EXCEPTION HANDLERS

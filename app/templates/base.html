@@ -104,7 +104,8 @@
         </div>
     </footer>
 
-    <script src="/static/js/api.js"></script>
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    <script src="{{ url_for('static_global', path='js/api.js') }}"></script>
+    {% endblock %}
 </body>
 </html>
