@@ -2,6 +2,7 @@
 import io
 import subprocess
 import sys
+
 from typing import List, Dict, Optional
 
 # --- CẤU HÌNH ---
@@ -29,7 +30,6 @@ ALLOWED_ZONES: Dict[str, List[str]] = {
     "feature/documents-module": [
         "app/modules/documents/",
     ],
-    # Lưu ý: Logic gốc map audit-logs vào documents, giữ nguyên theo yêu cầu
     "feature/audit-logs-module": [
         "app/modules/documents/",
     ],
