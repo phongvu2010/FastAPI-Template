@@ -10,7 +10,7 @@ import sqlalchemy as sa
 import sqlmodel.sql.sqltypes
 
 
-# revision identifiers, used by Alembic.
+# Revision identifiers, used by Alembic.
 revision = 'a12ad4cca38e'
 down_revision = None
 branch_labels = None

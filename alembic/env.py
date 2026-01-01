@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
-
 from app.core.config import settings
 from app.core.module_loader import discover_modules
 from app.db.base_model import Base
@@ -30,17 +29,12 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
-def get_url():
-    return str(settings.SQLALCHEMY_DATABASE_URI)
-
-
 def run_migrations_offline():
     """
     Run migrations in 'offline' mode.
     """
-    url = get_url()
     context.configure(
-        url=url,
+        url=str(settings.SQLALCHEMY_DATABASE_URI),
         target_metadata=target_metadata,
         literal_binds=True,
         compare_type=True,
@@ -55,8 +49,7 @@ def do_run_migrations(connection: Connection):
     This function will be called inside the async context.
     """
     context.configure(
-        connection=connection,
-        target_metadata=target_metadata,
+        connection=connection, target_metadata=target_metadata
     )
 
     with context.begin_transaction():
@@ -68,7 +61,7 @@ async def run_async_migrations():
     Create an Async Engine and run the migration.
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = get_url()
+    configuration["sqlalchemy.url"] = str(settings.SQLALCHEMY_DATABASE_URI)
 
     connectable = async_engine_from_config(
         configuration,
