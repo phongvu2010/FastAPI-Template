@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 BASE_DIR = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
+
 from app.core.config import settings
 from app.core.module_loader import discover_modules
 from app.db.base_model import Base

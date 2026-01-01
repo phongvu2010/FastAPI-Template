@@ -110,6 +110,7 @@ async def auth_exception_redirect_handler(
         status_code=status.HTTP_302_FOUND,
     )
 
+
 def load_modules(app):
     """
     Automatically scan the app/modules/ directory and register APIRouters.
