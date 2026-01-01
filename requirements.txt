@@ -43,11 +43,11 @@ greenlet
 # psycopg
 # pydantic[email]
 
-# Database & ORM (PostgreSQL)
+## Database & ORM (PostgreSQL)
 # sqlalchemy #[asyncio]
 # psycopg2-binary
 
-# Authentication & Security
+## Authentication & Security
 # authlib
 # google-auth
 # google-auth-httplib2
@@ -55,7 +55,7 @@ greenlet
 # cryptography # Cho internal signing (RSA/PSS)
 # pyHanko
 
-# Background Tasks
+## Background Tasks
 # celery[redis]
 
 # aiofiles # Cho xử lý file bất đồng bộ
@@ -64,7 +64,7 @@ greenlet
 # Thư viện cho Google SSO (ví dụ: python-social-auth nếu cần, nhưng ta sẽ dùng logic OAuth2 thuần)
 # pyjwt
 
-# Render HTML
+## Render HTML
 # jinja2
 # python-multipart # Cho upload file
 

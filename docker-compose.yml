@@ -64,7 +64,7 @@ services:
     ports:
       - 8000:8000
     # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload #--workers 4
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload # --workers 4
     restart: always
     depends_on:
       db:

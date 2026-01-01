@@ -10,7 +10,6 @@ from .models import Role, RoleRead, User, UserCreateInternal, UserRole
 
 
 # --- Role Queries ---
-
 async def get_role_by_name(db: AsyncSession, role_name: UserRole) -> Optional[Role]:
     """
     Retrieves a Role object by its Enum name.
@@ -31,7 +30,6 @@ async def get_all_roles(db: AsyncSession) -> List[RoleRead]:
 
 
 # --- User Queries ---
-
 async def get_user_by_google_sub(db: AsyncSession, google_sub: str) -> Optional[User]:
     """
     Retrieves a User by their unique Google ID (sub), eager loading roles.
@@ -69,7 +67,6 @@ async def get_all_users(db: AsyncSession) -> List[User]:
 
 
 # --- User Commands ---
-
 async def create_user_from_sso(
     db: AsyncSession,
     user_in: UserCreateInternal,

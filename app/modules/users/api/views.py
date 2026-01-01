@@ -136,7 +136,7 @@ async def admin_panel(
             "roles": roles,
             "csrf_token": csrf_token,
             "api_user_prefix": "/api/v1/users",
-            "is_admin": True,
+            "is_admin": True,  # Use the flag utility to highlight the menu
         },
     )
 

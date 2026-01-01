@@ -1,0 +1,46 @@
+# ==================================
+# 1. Các file và thư mục môi trường 
+# ==================================
+# Môi trường ảo (Virtual environment)
+# Python tạo ra thư mục này khi chạy 'python -m venv venv' hoặc 'conda create'
+# env/
+# .env/
+# venv/
+# .venv/
+
+# Files compiled Python
+# __pycache__/
+# *.pyc
+# *.pyd
+# *.$py.class
+
+# Files do Python tự sinh ra (logs, cache)
+# .pytest_cache/
+# .mypy_cache/
+# .tox/
+# dist/
+# build/
+# *.egg-info/
+
+
+# ==================================
+# 2. Thông tin nhạy cảm (SECURITY) 
+# ==================================
+
+# Biến môi trường (Tuyệt đối KHÔNG được push lên Github)
+# File này chứa các khóa API, mật khẩu DB, Google Client Secret...
+# .env
+# .flaskenv
+# .DS_Store
+
+
+# ==================================
+# 3. Thư mục và File cá nhân 
+# ==================================
+
+# File cấu hình của IDE (Phần mềm lập trình)
+# Tránh đẩy lên file cấu hình của riêng Dev A làm ảnh hưởng Dev B
+# .vscode/  # Cho Visual Studio Code
+# .idea/    # Cho PyCharm / IntelliJ
+# *.swp
+# *~

@@ -18,6 +18,11 @@ from .user import (
 # UserRead.model_rebuild()
 # RoleRead.model_rebuild()
 
+# # Rebuild Document models if they have circular refs with User
+# Document.model_rebuild()
+# DocumentVersion.model_rebuild()
+# Signature.model_rebuild()
+
 # __all__ = [
 #     "SQLModel",
 #     "User",
@@ -31,4 +36,11 @@ from .user import (
 #     "RoleRead",
 #     "RoleCreate",
 #     "UserRoleAssociation",
+#     # Export Documents
+#     "Document",
+#     "DocumentVersion",
+#     "DocumentStatus",
+#     "Signature",
+#     "AuditLog",
+#     "AuditAction",
 # ]
