@@ -81,16 +81,21 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         detail=exc.detail,
         status_code=exc.status_code,
     )
-    try:
-        base_url = request.url_for("error_page")
-        error_url = f"{base_url}?detail={exc.detail}&status_code={exc.status_code}"
-        return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
-    except Exception:
-        # Fallback if route error_page has not been loaded
-        return HTMLResponse(
-            status_code=exc.status_code,
-            content=f"<h1>Error {exc.status_code}</h1><p>{exc.detail}</p>",
-        )
+# @app.exception_handler(StarletteHTTPException)
+# async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+#     """
+#     Redirects web errors to HTML page, API errors to JSON.
+#     """
+#     try:
+#         base_url = request.url_for("error_page")
+#         error_url = f"{base_url}?detail={exc.detail}&status_code={exc.status_code}"
+#         return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
+#     except Exception:
+#         # Fallback if route error_page has not been loaded
+#         return HTMLResponse(
+#             status_code=exc.status_code,
+#             content=f"<h1>Error {exc.status_code}</h1><p>{exc.detail}</p>",
+#         )
 
 
 @app.exception_handler(Exception)

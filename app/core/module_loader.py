@@ -25,9 +25,10 @@ def discover_modules(target_submodule: str = "main"):
         # Only process if it's a directory and not a system folder (__pycache__)
         if os.path.isdir(module_path) and not module_name.startswith("__"):
             try:
-                # Dynamically load the module's routers.py file: app.modules.{module_name}.routers
+                # Create the import path. Example: app.modules.users.main
                 module_spec = f"app.modules.{module_name}.{target_submodule}"
                 # Preliminary check before importing
+                # importlib.util.find_spec helps check if a module exists without needing to import it.
                 if importlib.util.find_spec(module_spec):
                     module = importlib.import_module(module_spec)
                     loaded_modules.append(module)
