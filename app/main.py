@@ -14,7 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
 from .core.config import settings
-from .core.exceptions import NotAuthenticatedWebException
+from .core.templates import NotAuthenticatedWebException, get_templates
 from .core.module_loader import discover_modules
 
 # Setup logging
@@ -54,6 +54,10 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
 )
+
+# Initialize global templates variables
+templates = get_templates()
+
 
 # -----------------------------------------------------------------------
 # MIDDLEWARE

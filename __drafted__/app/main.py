@@ -1,13 +1,12 @@
-import importlib
 # import sentry_sdk
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Optional
 
+from .core.config import settings
 from .core.user_registry import user_registry
 
 
@@ -31,34 +30,6 @@ templates = Jinja2Templates(directory="templates")
 
 
 # -----------------------------------------------------------------------
-# TEMPLATE CONFIGURATION
-# -----------------------------------------------------------------------
-def get_templates():
-    """
-    Configure Jinja2 to load templates from the root directory 'app/templates'
-    AND from the 'templates' directories within each module.
-    """
-    # 1. Base global templates
-    base_template_dir = os.path.join(os.path.dirname(__file__), "templates")
-    template_dirs = [base_template_dir] if os.path.exists(base_template_dir) else []
-
-    # 2. Scan modules templates (Optional: nếu muốn template nằm trong module)
-    modules_path = os.path.join(os.path.dirname(__file__), "modules")
-    if os.path.exists(modules_path):
-        for module_name in os.listdir(modules_path):
-            module_template_dir = os.path.join(modules_path, module_name, "templates")
-            if os.path.isdir(module_template_dir):
-                template_dirs.append(module_template_dir)
-
-    logger.info(f"🎨 Template directories loaded: {template_dirs}")
-    return Jinja2Templates(directory=template_dirs)
-
-
-# Initialize global templates variables
-templates = get_templates()
-
-
-# -----------------------------------------------------------------------
 # EXCEPTION HANDLERS
 # -----------------------------------------------------------------------
 @app.exception_handler(StarletteHTTPException)
@@ -75,27 +46,28 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
     # If it's a web request, redirect to the error page.
     # NOTE: Ensure the route 'error_page' exists below.
+    try:
+        base_url = request.url_for("error_page")
+        error_url = f"{base_url}?detail={exc.detail}&status_code={exc.status_code}"
+        return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
+    except Exception:
+        # Fallback if route error_page has not been loaded
+        return HTMLResponse(
+            status_code=exc.status_code,
+            content=f"<h1>Error {exc.status_code}</h1><p>{exc.detail}</p>",
+        )
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """
+    Redirects web errors to HTML page, API errors to JSON.
+    """
     return await error_page(
         request=request,
         error_message=f"Lỗi {exc.status_code}",
         detail=exc.detail,
         status_code=exc.status_code,
     )
-# @app.exception_handler(StarletteHTTPException)
-# async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-#     """
-#     Redirects web errors to HTML page, API errors to JSON.
-#     """
-#     try:
-#         base_url = request.url_for("error_page")
-#         error_url = f"{base_url}?detail={exc.detail}&status_code={exc.status_code}"
-#         return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
-#     except Exception:
-#         # Fallback if route error_page has not been loaded
-#         return HTMLResponse(
-#             status_code=exc.status_code,
-#             content=f"<h1>Error {exc.status_code}</h1><p>{exc.detail}</p>",
-#         )
 
 
 @app.exception_handler(Exception)

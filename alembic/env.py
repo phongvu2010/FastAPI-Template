@@ -64,9 +64,7 @@ async def run_async_migrations():
     configuration["sqlalchemy.url"] = str(settings.SQLALCHEMY_DATABASE_URI)
 
     connectable = async_engine_from_config(
-        configuration,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        configuration, prefix="sqlalchemy.", poolclass=pool.NullPool
     )
 
     async with connectable.connect() as connection:

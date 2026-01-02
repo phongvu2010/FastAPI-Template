@@ -14,7 +14,7 @@ services:
       # Thêm cờ để tăng cường bảo mật
       - POSTGRES_INITDB_ARGS=--data-checksums --auth=scram-sha-256
     networks:
-      - app_network
+      - network
     ports:
       - 5433:5432
     restart: always
@@ -33,7 +33,7 @@ services:
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     networks:
-      - app_network
+      - network
     command: tunnel --no-autoupdate run
     restart: always
 
@@ -44,7 +44,7 @@ services:
     env_file:
       - .env
     networks:
-      - app_network
+      - network
     command: bash prestart.sh
     depends_on:
       db:
@@ -60,7 +60,7 @@ services:
     env_file:
       - .env
     networks:
-      - app_network
+      - network
     ports:
       - 8000:8000
     # Lệnh để chạy ứng dụng (ghi đè CMD trong Dockerfile)
@@ -82,5 +82,5 @@ volumes:
   postgres_data:
 
 networks:
-  app_network:
+  network:
     driver: bridge
