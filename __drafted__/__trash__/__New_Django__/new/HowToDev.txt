@@ -1,0 +1,68 @@
+Bước 1: Khởi tạo Project Django
+
+Dùng docker-compose run để tạo project Django bên trong thư mục web
+```
+docker-compose run --rm web django-admin startproject core .
+```
+
+Bước 2: Tạo App cho Custom User
+
+Chúng ta cần Custom User model
+```
+docker-compose run --rm web python manage.py startapp accounts
+```
+
+Bước 3: Cấu hình settings.py & Định nghĩa Custom User Model
+
+Bước 4: Chạy Stack
+```
+docker-compose up --build
+```
+
+Bước 5: Tạo Migrations
+```
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
+```
+
+Bước 6: Tạo tài khoản Superuser Admin ban đầu (để quản lý vai trò)
+```
+docker-compose exec web python manage.py createsuperuser
+```
+
+
+1. 🛑 Hàm Ngăn Chặn Thay Đổi (Prevent_Modification_Function)
+Hàm này sẽ được kích hoạt trước bất kỳ hành động DELETE hoặc UPDATE nào trên bảng AuditLog và sẽ ngay lập tức trả về một lỗi, ngăn chặn hành động đó.
+SQL
+-- SQL: app/documents/migrations/00xx_auditlog_trigger_sql.sql (Phần 1)
+--
+-- TẠO HÀM (FUNCTION)
+--
+CREATE OR REPLACE FUNCTION prevent_audit_log_modification()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- 
+    IF TG_OP = 'DELETE' THEN
+        RAISE EXCEPTION 'Audit logs are immutable. Deletion of audit log records is forbidden.';
+        
+    ELSIF TG_OP = 'UPDATE' THEN
+        RAISE EXCEPTION 'Audit logs are immutable. Updating audit log records is forbidden.';
+    END IF;
+    
+    -- Đối với INSERT, chúng ta cho phép và trả về dòng mới
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+2. ⚡️ Tạo Trigger Trên Bảng documents_auditlog
+Sau khi hàm được tạo, chúng ta tạo một Trigger để liên kết hàm đó với các sự kiện UPDATE và DELETE trên bảng AuditLog.
+Lưu ý: Tên bảng sẽ là documents_auditlog nếu bạn đặt AuditLog model trong app documents.
+SQL
+-- SQL: app/documents/migrations/00xx_auditlog_trigger_sql.sql (Phần 2)
+--
+-- TẠO TRIGGER
+--
+CREATE TRIGGER auditlog_immutable_trigger
+BEFORE DELETE OR UPDATE ON documents_auditlog
+FOR EACH ROW
+EXECUTE FUNCTION prevent_audit_log_modification();

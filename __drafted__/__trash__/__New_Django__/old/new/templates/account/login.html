@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n allauth account socialaccount %}
+
+{% block content %}
+    <h1>{% trans "Đăng nhập Hệ thống" %}</h1>
+
+    <div class="social-login">
+        <h3>Đăng nhập bằng Google SSO</h3>
+
+        {% provider_list form=form process="login" %}
+    </div>
+
+    <hr>
+
+{% endblock %}

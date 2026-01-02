@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Secure Doc Flow</title>
+</head>
+<body>
+    <h1>Chào mừng, {{ user.full_name }}!</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Bạn đã đăng nhập thành công. Đây là nội dung bảo mật.</p>
+    
+    <h2>Vai trò hiện tại:</h2>
+    <ul>
+    {% for role in roles %}
+        <li>{{ role }}</li>
+    {% endfor %}
+    </ul>
+
+    {% if is_admin %}
+        <p>
+            Bạn có vai trò ADMIN.
+            <a href="/admin">Truy cập Trang Quản trị</a>
+        </p>
+    {% endif %}
+
+    <!-- <a href="/auth/logout">Đăng xuất (Cần triển khai)</a> -->
+<nav>
+    <a href="/auth/logout" 
+       style="color: red; margin-left: 20px;"
+       onclick="localStorage.clear();" >
+       Đăng xuất
+    </a>
+</nav>
+
+</body>
+</html>

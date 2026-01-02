@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     Quản lý toàn bộ cấu hình và biến môi trường của ứng dụng.
     """
 
+    # DESCRIPTION: str =Field(default="", alias="DESCRIPTION")
     DESCRIPTION: str = ""
 
     # Secret để ký state CSRF (Nên khác JWT_SECRET)
@@ -15,8 +16,8 @@ class Settings(BaseSettings):
 
 # class Settings(BaseSettings):
 #     """
-#     Class định nghĩa các biến cấu hình ứng dụng, lấy giá trị
-#     theo thứ tự ưu tiên:
+#     Quản lý toàn bộ cấu hình và biến môi trường của ứng dụng.
+#     Giá trị theo thứ tự ưu tiên:
 #     1. Biến môi trường (Environment Variables)
 #     2. File .env (Nếu được bật)
 #     3. Giá trị mặc định (Default values)

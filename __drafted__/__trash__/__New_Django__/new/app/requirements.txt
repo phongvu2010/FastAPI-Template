@@ -1,0 +1,67 @@
+# python -m venv .venv
+# or
+# python3 -m venv .venv
+
+
+### On Windows (cmd)
+### Run project in venv
+# .venv\Scripts\activate.bat
+# .venv\Scripts\python.exe -m pip install --upgrade pip
+# .venv\Scripts\python.exe -m pip install --upgrade -r requirements.txt
+
+# pip freeze > requirements.txt
+
+### On MacOS
+### Run project in venv
+# source .venv/bin/activate
+# pip3 install --upgrade pip
+# pip3 install --upgrade -r requirements.txt
+
+# pip3 freeze > requirements.txt
+
+
+### Web Framework
+Django
+django-allauth               # Cho Google OAuth
+django-minio-storage
+djangorestframework
+# dj-rest-auth
+# djangorestframework-simplejwt
+# django-celery-beat
+# django-celery-results       # Tùy chọn, để lưu kết quả Celery vào DB
+# django-cors-headers
+# django-environ
+# whitenoise
+
+
+### Provider Google
+# python3-openid
+
+
+### Kết nối PostgreSQL
+psycopg2-binary
+
+
+### Kết nối Redis/Celery
+celery[redis]               # Celery và Redis broker
+
+
+# Quản lý cấu hình (để đọc biến môi trường từ .env)
+python-decouple
+
+
+# black
+cryptography                 # Ký nội bộ RSA/PSS
+gunicorn                     # WSGI Server cho Production
+requests                     # Để tích hợp API CA bên ngoài
+PyJWT
+
+
+
+
+### Packages - Document Management System
+# uvicorn
+# pydantic
+# pyhanko # Thư viện ký số
+# passlib[bcrypt]
+# python-jose

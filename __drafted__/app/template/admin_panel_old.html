@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản trị Hệ thống</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .active { color: green; font-weight: bold; }
+        .inactive { color: red; }
+        .msg { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Trang Quản trị</h1>
+    <p>Admin: {{ user.full_name }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Tên</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr id="row-{{ u.id }}">
+                <td>{{ u.id }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.full_name or "N/A" }}</td>
+                <td class="role-cell">{{ u.roles|map(attribute='name')|join(', ') }}</td> 
+                <td>
+                    <span class="{{ 'active' if u.is_active else 'inactive' }}" id="status-txt-{{ u.id }}">
+                        {{ 'Active' if u.is_active else 'Inactive' }}
+                    </span>
+                </td>
+                <td>
+                    <select id="role-select-{{ u.id }}">
+                        {% for role in roles %}
+                            <option value="{{ role.name.value }}">{{ role.name.value }}</option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="assignRole({{ u.id }})">Gán Role</button>
+                    <hr>
+                    <button id="btn-toggle-{{ u.id }}" onclick="toggleStatus({{ u.id }}, {{ 'true' if u.is_active else 'false' }})">
+                        {{ 'Khóa' if u.is_active else 'Mở khóa' }}
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p id="message-area" class="msg"></p>
+    <a href="/app">Về Dashboard</a> | <a href="/auth/logout">Đăng xuất</a>
+
+    <script>
+        const msgArea = document.getElementById('message-area');
+
+        function showMsg(text, isError = false) {
+            msgArea.textContent = text;
+            msgArea.style.color = isError ? 'red' : 'green';
+            setTimeout(() => msgArea.textContent = '', 3000);
+        }
+
+        async function assignRole(userId) {
+            const roleName = document.getElementById(`role-select-${userId}`).value;
+            try {
+                // Lưu ý: Không gửi Header Authorization, trình duyệt tự gửi Cookie
+                const res = await fetch(`/users/${userId}/roles`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role_name: roleName })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    const newRoles = data.roles.map(r => r.name).join(', ');
+                    document.querySelector(`#row-${userId} .role-cell`).textContent = newRoles;
+                    showMsg(`Đã gán role ${roleName} thành công.`);
+                } else {
+                    const err = await res.json();
+                    showMsg(`Lỗi: ${err.detail}`, true);
+                }
+            } catch (e) { showMsg(`Lỗi mạng: ${e}`, true); }
+        }
+
+        async function toggleStatus(userId, currentStatus) {
+            try {
+                const res = await fetch(`/users/${userId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_active: !currentStatus })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const statusTxt = document.getElementById(`status-txt-${userId}`);
+                    const btn = document.getElementById(`btn-toggle-${userId}`);
+                    
+                    statusTxt.textContent = data.is_active ? 'Active' : 'Inactive';
+                    statusTxt.className = data.is_active ? 'active' : 'inactive';
+                    btn.textContent = data.is_active ? 'Khóa' : 'Mở khóa';
+                    btn.onclick = () => toggleStatus(userId, data.is_active);
+                    
+                    showMsg("Cập nhật trạng thái thành công.");
+                } else {
+                    const err = await res.json();
+                    showMsg(`Lỗi: ${err.detail}`, true);
+                }
+            } catch (e) { showMsg(`Lỗi mạng: ${e}`, true); }
+        }
+    </script>
+</body>
+</html>

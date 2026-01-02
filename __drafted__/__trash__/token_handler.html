@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Đang xử lý đăng nhập...</title>
+</head>
+<body>
+    <p>Đăng nhập thành công! Đang chuyển hướng...</p>
+
+    <script>
+        const accessToken = '{{ access_token }}';
+        const tokenType = '{{ token_type }}';
+        const redirectUrl = '{{ redirect_url }}';
+        
+        // --- 1. LƯU TOKEN VÀO LOCAL STORAGE ---
+        // Lưu token vào localStorage để các request sau có thể truy cập
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('token_type', tokenType);
+
+        // --- 2. CHUYỂN HƯỚNG SANG TRANG DASHBOARD ---
+        window.location.href = redirectUrl;
+    </script>
+</body>
+</html>

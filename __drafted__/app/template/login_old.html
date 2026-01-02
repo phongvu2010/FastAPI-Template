@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập vào Hệ thống</title>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 100px;">
+        <h1>Chào mừng đến với Secure Doc Flow</h1>
+        <p>Vui lòng đăng nhập bằng tài khoản Google của bạn để tiếp tục.</p>
+
+        <a href="/auth/login" 
+           style="
+               display: inline-block;
+               padding: 10px 20px;
+               font-size: 16px;
+               color: white;
+               background-color: #4285F4; /* Màu Google */
+               text-decoration: none;
+               border-radius: 5px;
+               cursor: pointer;
+           ">
+           Đăng nhập bằng Google
+        </a>
+
+        {% if error_message %}
+            <p style="color: red;">{{ error_message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

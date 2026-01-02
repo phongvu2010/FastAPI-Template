@@ -1,0 +1,162 @@
+services:
+  web:
+    build: ./app
+    container_name: web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app:/app
+      - ./secrets:/secrets
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    # depends_on:
+    #   - db
+    #   - redis
+
+  celery_worker:
+    build: ./app
+    container_name: celery
+    command: >
+      sh -c "
+        # Tạo Group/User Celery
+        groupadd celery_G || true;
+        useradd -g celery_G celery || true;
+
+        # RẤT QUAN TRỌNG: Đảm bảo user celery có quyền ghi vào Volume
+        # Gán quyền sở hữu thư mục /storages cho user celery vừa tạo
+        # chown -R celery:celery_G /storages &&
+
+        # Khởi động Celery Worker với user/group đã tạo
+        celery -A core beat -l info --uid=celery --gid=celery_G
+      "
+    volumes:
+      - ./app:/app
+      - ./secrets:/secrets
+    env_file:
+      - .env
+    # depends_on:
+    #   - web
+    #   - redis
+
+  celery-beat:
+    build: ./app
+    container_name: celery_beat
+    command: celery -A core beat -l info
+    volumes:
+      - ./app:/app
+      - ./secrets:/secrets
+    env_file:
+      - .env
+    # environment:
+    #   - SECRET_KEY=${DJANGO_SECRET_KEY}
+    #   - DATABASE_URL=postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:${DATABASE_PORT}/${DATABASE_NAME}
+    #   - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}/0
+    # depends_on:
+    #   - web
+    #   - redis
+
+
+
+
+
+
+
+
+
+
+
+# services:
+#   # 3. Dịch vụ Web API (Django)
+#   web:
+#     build: . # Dockerfile của Django được đặt trong thư mục hiện tại
+#     container_name: web
+#     volumes:
+#       - ./app:/app # Ánh xạ thư mục dự án cục bộ vào container
+#       - storage_volume:/storages # Lưu trữ file PDF (Local Disk)
+#     env_file:
+#       - .env # Sử dụng tệp .env để quản lý biến môi trường
+#     ports:
+#       - "8000:8000"
+#     # command: sh -c "django-admin startproject core . && python manage.py startapp documents"
+#     command: >
+#       sh -c "
+#         # Chỉ chạy migrate trong Production
+#         python manage.py migrate --noinput &&
+
+#         # # Thu thập Static Files (cần thiết cho DEBUG=False)
+#         # python manage.py collectstatic --noinput && 
+
+#         # Khởi động Gunicorn
+#         # python manage.py runserver 0.0.0.0:8000
+#         python manage.py collectstatic --noinput &&
+#         gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4 --log-level info
+#       "
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#       redis:
+#         condition: service_started
+#     restart: always
+
+#   # 3. Ứng dụng Backend (FastAPI)
+#   app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     restart: always
+#     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+#     volumes:
+#       - .:/code
+#       # Mount thư mục lưu trữ hồ sơ trên host: [Đường dẫn Local]:/app_storage
+#       - /path/to/your/local/storage:/code/app_storage
+#     ports:
+#       - "8000:8000"
+#     env_file:
+#       - .env
+#     depends_on:
+#       - db
+#       - redis
+
+#   # 4. Dịch vụ Tác vụ Bất đồng bộ (Celery Worker)
+#   celery_worker:
+#     build: .
+#     container_name: worker
+#     volumes:
+#       - ./app:/app
+#     env_file:
+#       - .env
+#     command: >
+#       sh -c "
+#         # Tạo Group/User Celery
+#         groupadd celery_G || true;
+#         useradd -g celery_G celery || true;
+
+#         # RẤT QUAN TRỌNG: Đảm bảo user celery có quyền ghi vào Volume
+#         # Gán quyền sở hữu thư mục /storages cho user celery vừa tạo
+#         chown -R celery:celery_G /storages &&
+
+#         # Khởi động Celery Worker với user/group đã tạo
+#         celery -A core worker -l info --uid=celery --gid=celery_G
+#       "
+#     depends_on:
+#       web:
+#         condition: service_started
+#     restart: always
+
+#   # 4. Celery Worker (Xử lý tác vụ nền)
+#   worker:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: celery -A app.celery_app worker -l info
+#     volumes:
+#       - .:/code
+#     env_file:
+#       - .env
+#     depends_on:
+#       - app
+#       - redis
+
+# volumes:
+#   storage_volume: # Volume quan trọng nhất: Lưu trữ vật lý các file PDF

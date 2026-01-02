@@ -1,0 +1,145 @@
+services:
+  # ------------------------------------------------------------
+  # 1. PostgreSQL Database
+  # ------------------------------------------------------------
+  db:
+    image: postgres:16
+    # image: postgres:18.0-alpine
+    container_name: db
+    restart: always
+    environment:
+      # Sử dụng biến môi trường từ tệp .env để bảo mật
+      TZ: ${TZ}
+      # LC_ALL: C.UTF-8
+      # LANG: C.UTF-8
+      POSTGRES_INITDB_ARGS: --data-checksums --auth=scram-sha-256
+      POSTGRES_DB: ${DATABASE_NAME?Variable not set}
+      POSTGRES_USER: ${DATABASE_USER?Variable not set}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD?Variable not set}
+      # # Cần thiết cho Vault Backend (nên tạo riêng trong database)
+      # VAULT_DB_NAME: ${VAULT_DB_NAME}
+      # VAULT_DB_USER: ${VAULT_DB_USER}
+      # VAULT_DB_PASSWORD: ${VAULT_DB_PASSWORD}
+    volumes:
+      # Dữ liệu sẽ được lưu trữ persistently
+      - postgres_data:/var/lib/postgresql/data
+      # - postgres_data:/var/lib/postgresql/18/data
+    ports:
+      # Bỏ dòng này nếu không cần truy cập DB từ bên ngoài Docker
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - main_network
+
+  # ------------------------------------------------------------
+  # 2. Redis Cache/Broker
+  # ------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    # image: redis:8.2.3-alpine
+    container_name: redis_cache
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    # Thiết lập mật khẩu cho Redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - main_network
+
+  # ------------------------------------------------------------
+  # 3. MinIO Object Storage (S3 compatible)
+  # ------------------------------------------------------------
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: minio_storage
+    restart: always
+    environment:
+      # Cần thay thế bằng các khóa bảo mật mạnh
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SERVER_URL: http://localhost:9000 # Điều chỉnh nếu chạy trên server khác
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000" # API endpoint
+      - "9001:9001" # Console/UI endpoint
+    # Khởi động MinIO server và kích hoạt giao diện Console
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - main_network
+
+  # ------------------------------------------------------------
+  # 4 HashiCorp Vault
+  # ------------------------------------------------------------
+  # vault:
+  #   image: hashicorp/vault:1.15.4
+  #   container_name: vault_server
+  #   restart: always
+  #   environment:
+  #     # Truyền biến môi trường cần thiết cho cấu hình HCL
+  #     VAULT_ADDR: ${VAULT_ADDR}
+  #     VAULT_DB_HOST: ${VAULT_DB_HOST}
+  #     VAULT_DB_NAME: ${VAULT_DB_NAME}
+  #     VAULT_DB_USER: ${VAULT_DB_USER}
+  #     VAULT_DB_PASSWORD: ${VAULT_DB_PASSWORD}
+  #   volumes:
+  #     # Mount cấu hình
+  #     - ./vault/config.hcl:/vault/config/config.hcl:ro
+  #     # Volume để Vault lưu trữ dữ liệu nội bộ (ví dụ: các chính sách)
+  #     - vault_data:/vault/data
+  #   # Bắt buộc để Vault có thể khóa bộ nhớ (memory locking) và ngăn
+  #   # các bí mật bị tráo đổi ra đĩa (swapping secrets to disk).
+  #   cap_add:
+  #     - IPC_LOCK
+  #   ports:
+  #     - "8200:8200" # Cổng API mặc định của Vault
+  #   # Khởi động Vault bằng tệp cấu hình
+  #   command: server -config=/vault/config/config.hcl
+  #           #  server -dev -dev-root-token-id="${VAULT_DEV_ROOT_TOKEN_ID}" -dev-listen-address="0.0.0.0:8200"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy # Chỉ khởi động sau khi Postgres sẵn sàng
+  #   healthcheck:
+  #     test: ["CMD", "sh", "-c", "wget -q -O- http://127.0.0.1:8200/v1/sys/health | grep 'sealed'`"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - main_network
+
+# Định nghĩa các volume để dữ liệu được lưu trữ lâu dài
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  # vault_data: # Volume cho dữ liệu nội bộ của Vault
+
+networks:
+  main_network:
+    driver: bridge
+
+### ⚠️ Các Bước Thủ Công Bắt Buộc cho Vault trong Production
+
+# Sau khi chạy `docker-compose up -d`, service `vault` sẽ chạy nhưng ở trạng thái **Sealed** (niêm phong) và **chưa hoạt động**.
+# 1.  **Khởi tạo (Initialize):**
+#     * Bạn cần kết nối vào container Vault và chạy lệnh `vault operator init`. Lệnh này tạo ra các **Unseal Keys** (Chìa khóa mở niêm phong) và một **Root Token** (Token gốc).
+# 2.  **Mở niêm phong (Unseal):**
+#     * Sử dụng ít nhất 3 trong 5 Unseal Keys vừa tạo để mở niêm phong Vault, cho phép nó truy cập vào Backend Storage (Postgres).
+#     * Lệnh: `vault operator unseal <key_shard>`
+# Đây là những bước quan trọng không thể tự động hóa trong `docker-compose.yml` mà phải thực hiện thủ công trong môi trường Production.
