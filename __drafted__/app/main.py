@@ -27,6 +27,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Initialize global templates variables
 templates = Jinja2Templates(directory="templates")
+# templates = get_templates()
 
 
 # -----------------------------------------------------------------------

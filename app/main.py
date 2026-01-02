@@ -12,9 +12,10 @@ from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
+from typing import Optional
 
 from .core.config import settings
-from .core.templates import NotAuthenticatedWebException, get_templates
+from .core.template import NotAuthenticatedWebException, render_error_response
 from .core.module_loader import discover_modules
 
 # Setup logging
@@ -54,10 +55,6 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
 )
-
-# Initialize global templates variables
-templates = get_templates()
-
 
 # -----------------------------------------------------------------------
 # MIDDLEWARE
@@ -115,6 +112,9 @@ async def auth_exception_redirect_handler(
     )
 
 
+# -----------------------------------------------------------------------
+# LOAD MODULES
+# -----------------------------------------------------------------------
 def load_modules(app):
     """
     Automatically scan the app/modules/ directory and register APIRouters.
@@ -189,3 +189,21 @@ async def health():
     </body>
     </html>
     """
+
+
+@app.get("/error", response_class=HTMLResponse)
+async def error_page(
+    request: Request,
+    error_message: str = "An Error Occurred",
+    detail: Optional[str] = "The requested resource could not be loaded.",
+    status_code: int = status.HTTP_200_OK,
+):
+    """
+    Generic error page.
+    """
+    return render_error_response(
+        request,
+        error_message,
+        detail,
+        status_code,
+    )

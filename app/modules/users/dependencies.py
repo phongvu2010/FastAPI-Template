@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated, Optional
 
 from ...core.config import settings
-from ...core.exceptions import NotAuthenticatedWebException
+from ...core.template import NotAuthenticatedWebException
 from ...core.security import decode_access_token
 from ...db.database import get_db
 from . import crud as crud

@@ -25,28 +25,6 @@ templates = Jinja2Templates(directory=[
 ])
 
 
-def render_error_response(
-    request: Request,
-    title: str,
-    detail: str,
-    status_code: int = status.HTTP_400_BAD_REQUEST,
-    user: Optional[User] = None,
-) -> Response:
-    """
-    Helper to render error page.
-    """
-    return templates.TemplateResponse(
-        "error_page.html",
-        {
-            "request": request,
-            "error_message": title,
-            "detail": detail,
-            "user": user,
-        },
-        status_code=status_code,
-    )
-
-
 @router.get("/", response_class=HTMLResponse, name="dashboard_page")
 async def dashboard_page(
     request: Request,
@@ -160,22 +138,4 @@ async def profile_page(
             "departments": DEPARTMENTS,
             "is_admin": UserRole.ADMIN in user_role_names,
         },
-    )
-
-
-@router.get("/error", response_class=HTMLResponse)
-async def error_page(
-    request: Request,
-    title: str = "An Error Occurred",
-    detail: Optional[str] = "The requested resource could not be loaded.",
-    status_code: int = status.HTTP_200_OK,
-):
-    """
-    Generic error page.
-    """
-    return render_error_response(
-        request,
-        title,
-        detail,
-        status_code,
     )
