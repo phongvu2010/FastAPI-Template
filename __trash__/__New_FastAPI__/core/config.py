@@ -1,6 +1,11 @@
+import secrets
+
+from pathlib import Path
+from pydantic import Field, SecretStr, PostgresDsn
+from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, SecretStr
 from typing import Optional
+from urllib import parse
 
 # Lưu ý: Cần cài đặt thư viện này: pip install pydantic-settings
 
@@ -14,8 +19,9 @@ class Settings(BaseSettings):
     # Cấu hình Pydantic v2: Thiết lập file .env là nguồn chính
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_file_encoding='utf-8',
-        extra='ignore' # Bỏ qua các biến không được định nghĩa trong class
+        env_file_encoding="utf-8",
+        extra='ignore', # Bỏ qua các biến không được định nghĩa trong class
+        case_sensitive=False,  # Không phân biệt chữ hoa-thường
     )
 
     # =======================================================================
@@ -34,6 +40,24 @@ class Settings(BaseSettings):
         ...,
         description="URL kết nối cơ sở dữ liệu (vd: postgresql://user:pass@host:port/dbname)"
     )
+    DB_USER: str = "docmanager"
+    DB_PASSWORD: str = "secretpassword"
+    DB_NAME: str = "document_db"
+    DB_HOST: str = "db"
+    DB_PORT: int = 5432
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+        return MultiHostUrl.build(
+            scheme = "postgresql+psycopg2",
+            username = self.DB_USER,
+            password = parse.quote_plus(self.DB_PASSWORD),
+            host = self.DB_HOST,
+            port = self.DB_PORT,
+            path = self.DB_NAME
+        )
+
 
     # =======================================================================
     # 3. Cấu hình Bảo mật và Xác thực (dùng cho JWT)
@@ -42,8 +66,10 @@ class Settings(BaseSettings):
         ...,
         description="Key bí mật dùng để ký JWT Token. Rất quan trọng!"
     )
+    # Cần tạo một chuỗi ngẫu nhiên (Vd: openssl rand -hex 32)
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 7 ngày
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 # 1 ngày
 
     # Cấu hình cho Signed URL Token (dùng trong storage_service)
     SIGNED_URL_SECRET: SecretStr = Field(
@@ -62,12 +88,20 @@ class Settings(BaseSettings):
         description="Thư mục vật lý cho Local Storage"
     )
 
+    # Đường dẫn lưu trữ file (Trong Docker Container)
+    # Pydantic sẽ tự động chuyển đổi string từ .env thành đối tượng Path
+    BASE_STORAGE_PATH: Path = Path("/code/app_storage")
+
     # =======================================================================
     # 4. Cấu hình Celery/Worker
     # =======================================================================
     # Giả định dùng Redis cho cả Broker và Backend
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/1"
+
+    # Cấu hình Redis (Celery Broker)
+    REDIS_HOST: str = "redis"
+    REDIS_PORT: int = 6379
 
     # =======================================================================
     # 5. Cấu hình Tích hợp bên ngoài (Google SSO)
