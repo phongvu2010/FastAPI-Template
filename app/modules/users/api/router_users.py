@@ -72,20 +72,3 @@ async def update_status(
         },
     )
 
-
-# @router.post("/{user_id}/roles", response_model=UserRead)
-# async def assign_role(
-#     user_id: int,
-#     role_in: UserUpdateRole,
-#     db: AsyncSession = Depends(get_db),
-#     _: User = Depends(require_role([UserRole.ADMIN])),
-# ):
-#     """Gán Role cho user (Admin only)."""
-#     user = await user_crud.get_user_by_id(db, user_id)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found.")
-
-#     try:
-#         return await user_crud.assign_role_to_user(db, user, role_in.role_name)
-#     except ValueError as e:
-#         raise HTTPException(status_code=400, detail=str(e))
