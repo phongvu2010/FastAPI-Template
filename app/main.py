@@ -1,3 +1,5 @@
+import importlib
+import logging
 # import sentry_sdk
 
 from fastapi import FastAPI, Request, status
@@ -7,7 +9,11 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Optional
 
 from .core.config import settings
+from .core.exceptions import NotAuthenticatedWebException
 from .core.user_registry import user_registry
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 
 # -----------------------------------------------------------------------
@@ -58,6 +64,23 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             content=f"<h1>Error {exc.status_code}</h1><p>{exc.detail}</p>",
         )
 
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """
+    Redirects web errors to HTML page, API errors to JSON.
+    """
+    if exc.status_code == status.HTTP_404_NOT_FOUND and not request.url.path.startswith(settings.API_V1_STR):
+        base_url = request.url_for("error_page")
+        error_url = f"{base_url}?title=Page Not Found&detail=Resource does not exist.&status_code={exc.status_code}"
+        return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     """
@@ -83,6 +106,43 @@ async def global_exception_handler(request: Request, exc: Exception):
         detail="Đã có lỗi xảy ra phía máy chủ. Vui lòng thử lại sau.",
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
+
+
+def load_modules():
+    """
+    Automatically scan the app/modules/ directory and register APIRouters.
+    Each module must have a 'router.py' file containing the 'router' variable.
+    """
+    modules_base_path = os.path.join(os.path.dirname(__file__), "modules")
+
+    if not os.path.exists(modules_base_path):
+        print("⚠️ The modules folder has not been created.")
+        return
+
+    # Browse through the subfolders in app/modules/
+    for module_name in os.listdir(modules_base_path):
+        module_path = os.path.join(modules_base_path, module_name)
+
+        # Only process if it's a directory and not a system folder (__pycache__)
+        if os.path.isdir(module_path) and not module_name.startswith("__"):
+            try:
+                # Dynamically load the module's routers.py file: app.modules.{module_name}.routers
+                # from .modules.auth.routers import auth, users
+                module_spec = f"app.modules.{module_name}.main"
+                module = importlib.import_module(module_spec)
+
+                # Check if the module has a variable 'routers' before registering it.
+                if hasattr(module, "router"):
+                    app.include_router(module.router)
+                    print(f"✅ Module connected: {module_name}")
+                else:
+                    print(f"⚠️ The module {module_name} is missing the variable 'router' in router.py.")
+
+            except ImportError as e:
+                print(f"❌ Module cannot be loaded {module_name}: {e}")
+
+            except Exception as e:
+                print(f"❌ Error when registering the module {module_name}: {e}")
 
 
 # -----------------------------------------------------------------------
@@ -116,3 +176,14 @@ async def error_page(
         },
         status_code=status_code,
     )
+
+    # return templates.TemplateResponse(
+    #     "error_page.html",
+    #     {
+    #         "request": request,
+    #         "error_message": error_message,
+    #         "detail": detail,
+    #         "user": user,
+    #     },
+    #     status_code=status_code,
+    # )
