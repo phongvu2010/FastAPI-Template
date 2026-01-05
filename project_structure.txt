@@ -12,11 +12,13 @@ SecureDoc-Flow/
 │   │   ├── __init__.py
 │   │   ├── config.py                   # Quản lý settings, Google Client ID/Secret
 │   │   ├── events.py                   # Event Bus (Quan trọng cho Audit Log)
-│   │   ├── exceptions.py               # Custom Exception Handlers
 │   │   ├── module_loader.py            # Load modules từ thư mục /app/modules/
-│   │   └── security.py                 # Base JWT logic, Password hashing
+│   │   ├── security.py                 # Base JWT logic, Password hashing
+│   │   ├── template.py                 # Custom Exception Handlers & Global Template
+│   │   └── user_registry.py
 │   │
 │   ├── db/                             # [CORE-PLATFORM]
+│   │   ├── __init__.py
 │   │   ├── base_model.py               # Abstract DB Model (TimestampMixin, etc.)
 │   │   └── database.py                 # SQLAlchemy Engine & SessionLocal
 │   │
@@ -36,11 +38,9 @@ SecureDoc-Flow/
 │   │   │   │       ├── admin.js                # Logic riêng cho bảng quản trị
 │   │   │   │       └── profile.js              # Logic riêng cho bảng profile
 │   │   │   ├── templates/
-│   │   │   │   ├── admin/                  # Templates cho Admin Panel
-│   │   │   │   │   └── admin_panel.html
-│   │   │   │   └── auth/                   # Templates cho Users
-│   │   │   │       ├── login.html
-│   │   │   │       └── profile.html
+│   │   │   │   ├── admin_panel.html
+│   │   │   │   ├── login.html
+│   │   │   │   └── profile.html
 │   │   │   ├── __init__.py
 │   │   │   ├── crud.py
 │   │   │   ├── dependencies.py         # GetCurrentUser, PermissionChecker
@@ -81,7 +81,7 @@ SecureDoc-Flow/
 │   │       └── api.js                  # Xử lý fetch, CSRF và thông báo chung
 │   │
 │   ├── templates/                  # Jinja2 Templates (Global hoặc chia theo module)
-│   │   ├── _layout.html            # Base template
+│   │   ├── base.html               # Base template
 │   │   └── error_page.html
 │   │
 │   ├── __init__.py
